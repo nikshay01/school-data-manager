@@ -1,30 +1,33 @@
 import mongoose from "mongoose";
 
+const paymentSchema = new mongoose.Schema({
+  amount: { type: Number, required: true },
+  rn: { type: String },       // receipt number
+  date: { type: Date, default: Date.now }
+});
+
 const studentSchema = new mongoose.Schema({
-  sNo: Number,
-  studentName: String,
-  fatherName: String,
-  class: String,
-  section: String,
-  srNo: String,
-  address: String,
-  contact: String,
-  aadhar: String,
-  adDate: String,
-  dob: String,
-  penID: String,
-  adFee: Number,
-  fee: Number,
-  bus: Number,
-  hostel: Number,
-  discount: Number,
-  total: Number,
-  received: Number,
-  due: Number,
-  concessionBy: String,
-  amount: Number,
-  rn: String,
-  date: String
-}, { timestamps: true });
+    studentName: { type: String, required: true },
+    fatherName: { type: String, default: "" },
+    class: { type: String, default: "" },
+    section: { type: String, default: "" },
+    srNo: { type: String, default: "" },
+    address: { type: String, default: "" },
+    contact: { type: Number, default: 0 },
+    aadhar: { type: Number, default: 0 },
+    adDate: { type: Date, default: null },
+    dob: { type: Date, default: null },
+    penID: { type: Number, default: 0 },
+    fees: {
+      adFee: { type: Number, default: 0 },
+      fee: { type: Number, default: 0 },
+      bus: { type: Number, default: 0 },
+      hostel: { type: Number, default: 0 },
+      discount: { type: Number, default: 0 },
+      concessionBy: { type: String, default: "" }
+    },
+    payments: { type: [paymentSchema], default: [] },
+  }, { timestamps: true });
+  
 
 export default mongoose.model("Student", studentSchema);

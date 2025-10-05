@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Manager</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    padding: 20px;
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  form {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+
+  form input, form select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+
+  form button {
+    padding: 10px 20px;
+    border: none;
+    background: #007BFF;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  form button:hover {
+    background: #0056b3;
+  }
+
+  .error {
+    color: red;
+    margin-bottom: 10px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+
+  table th, table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+  }
+
+  table th {
+    background: #007BFF;
+    color: #fff;
+  }
+
+  table tr:hover {
+    background: #f1f1f1;
+  }
+</style>
+</head>
+<body>
+
+<h2>Student Manager</h2>
+
+<form id="studentForm">
+  <div class="error" id="formError"></div>
+  <input type="text" id="studentName" placeholder="Student Name *" required>
+  <input type="text" id="fatherName" placeholder="Father Name">
+  <input type="text" id="className" placeholder="Class">
+  <input type="text" id="section" placeholder="Section">
+  <input type="text" id="srNo" placeholder="SR No">
+  <input type="text" id="address" placeholder="Address">
+  <input type="number" id="contact" placeholder="Contact">
+  <input type="number" id="aadhar" placeholder="Aadhar">
+  <input type="date" id="adDate" placeholder="Admission Date">
+  <input type="date" id="dob" placeholder="DOB">
+  <input type="text" id="penID" placeholder="Pen ID">
+  <input type="number" id="adFee" placeholder="Admission Fee">
+  <input type="number" id="fee" placeholder="Tuition Fee">
+  <input type="number" id="bus" placeholder="Bus Fee">
+  <input type="number" id="hostel" placeholder="Hostel Fee">
+  <input type="number" id="discount" placeholder="Discount">
+  <input type="text" id="concessionBy" placeholder="Concession By">
+  <button type="submit">Add Student</button>
+</form>
+
+<table id="studentsTable">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Father Name</th>
+      <th>Class</th>
+      <th>Section</th>
+      <th>SR No</th>
+      <th>Contact</th>
+      <th>Aadhar</th>
+      <th>Admission Date</th>
+      <th>DOB</th>
+      <th>Pen ID</th>
+      <th>Fees</th>
+      <th>Concession By</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Student rows will appear here -->
+  </tbody>
+</table>
+
+<script>
+  const form = document.getElementById('studentForm');
+  const tableBody = document.querySelector('#studentsTable tbody');
+  const formError = document.getElementById('formError');
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    formError.textContent = '';
+
+    const studentName = document.getElementById('studentName').value.trim();
+    if (!studentName) {
+      formError.textContent = 'Student name is required!';
+      return;
+    }
+
+    const student = {
+      studentName,
+      fatherName: document.getElementById('fatherName').value || '',
+      class: document.getElementById('className').value || '',
+      section: document.getElementById('section').value || '',
+      srNo: document.getElementById('srNo').value || '',
+      address: document.getElementById('address').value || '',
+      contact: document.getElementById('contact').value || '',
+      aadhar: document.getElementById('aadhar').value || '',
+      adDate: document.getElementById('adDate').value || '',
+      dob: document.getElementById('dob').value || '',
+      penID: document.getElementById('penID').value || '',
+      fees: {
+        adFee: Number(document.getElementById('adFee').value) || 0,
+        fee: Number(document.getElementById('fee').value) || 0,
+        bus: Number(document.getElementById('bus').value) || 0,
+        hostel: Number(document.getElementById('hostel').value) || 0,
+        discount: Number(document.getElementById('discount').value) || 0
+      },
+      concessionBy: document.getElementById('concessionBy').value || ''
+    };
+
+    try {
+      const res = await fetch('http://localhost:5000/api/students', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(student)
+      });
+      if (!res.ok) throw new Error('Failed to add student');
+
+      form.reset();
+      await loadStudents(); // refresh table after submission
+    } catch (err) {
+      formError.textContent = 'Error submitting data!';
+      console.error(err);
+    }
+  });
+
+  // Function to fetch all students and populate the table
+  async function loadStudents() {
+    tableBody.innerHTML = '';
+    try {
+      const res = await fetch('http://localhost:5000/api/students');
+      if (!res.ok) throw new Error('Failed to fetch students');
+      const students = await res.json();
+
+      students.forEach(student => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${student.studentName}</td>
+          <td>${student.fatherName || ''}</td>
+          <td>${student.class || ''}</td>
+          <td>${student.section || ''}</td>
+          <td>${student.srNo || ''}</td>
+          <td>${student.contact || ''}</td>
+          <td>${student.aadhar || ''}</td>
+          <td>${student.adDate ? new Date(student.adDate).toLocaleDateString('en-GB') : ''}</td>
+          <td>${student.dob ? new Date(student.dob).toLocaleDateString('en-GB') : ''}</td>
+          <td>${student.penID || ''}</td>
+          <td>
+            Admission: ${student.fees?.adFee || 0}<br>
+            Tuition: ${student.fees?.fee || 0}<br>
+            Bus: ${student.fees?.bus || 0}<br>
+            Hostel: ${student.fees?.hostel || 0}<br>
+            Discount: ${student.fees?.discount || 0}
+          </td>
+          <td>${student.concessionBy || ''}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    } catch (err) {
+      tableBody.innerHTML = `<tr><td colspan="12">Error loading data</td></tr>`;
+      console.error(err);
+    }
+  }
+
+  // Load students on page load
+  window.onload = loadStudents;
+</script>
+
+</body>
+</html>
