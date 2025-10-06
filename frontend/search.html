@@ -1,29 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-</head>
-<body>
-    <a href="table.html">table</a><br><br><br>
-    <input type="text" id="search" placeholder="srNo"><br><br>
+  </head>
+  <body>
+    <a href="table.html">table</a><br /><br /><br />
+    <input type="text" id="search" placeholder="srNo" /><br /><br />
     <button id="srcbtn">search</button>
-</body>
-<script>
-    const btn = document.getElementById('srcbtn')
-    btn.addEventListener('click', async()=>{
-    const field = document.getElementById('search').value.trim()
-    try{
-    const Response = await fetch(`http://localhost:5000/api/students/update?query=${encodeURIComponent(field)}`)
-    const data= await Response.json();
-    if (!Response.ok) {
-        alert('student not found')
-        return;
-    }
-    console.log(Response);
-    console.log(data);
-}catch(e){console.log(e);}
-    })
-</script>
+  </body>
+  <script>
+    const btn = document.getElementById("srcbtn");
+    btn.addEventListener("click", async () => {
+      const field = document.getElementById("search").value.trim();
+      try {
+        const Response = await fetch(
+          `http://localhost:5000/api/students/update?query=${encodeURIComponent(
+            field
+          )}`
+        );
+        const data = await Response.json();
+        if (!Response.ok) {
+          alert("student not found");
+          return;
+        }
+        console.log(Response);
+        console.log(data);
+      } catch (e) {
+        console.log(e);
+      }
+    });
+  </script>
 </html>

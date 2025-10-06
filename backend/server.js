@@ -41,8 +41,9 @@ app.get("/api/students", async (req, res) => {
 app.get("/api/students/update", async(req,res)=>{
   console.log('request detected at update section\n');
     const students = await Student.find();
-    console.log(req.query.query)
-    
+    const log = req.query.query
+   res.send(students)
+
 })
 
 const PORT = process.env.PORT || 5000;
