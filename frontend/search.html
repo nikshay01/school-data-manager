@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <a href="table.html">table</a><br><br><br>
+    <input type="text" id="search" placeholder="srNo"><br><br>
+    <button id="srcbtn">search</button>
+</body>
+<script>
+    const btn = document.getElementById('srcbtn')
+    btn.addEventListener('click',()=>{
+    const field = document.getElementById('search').value
+
+        console.log(field,'   ',field.trim());
+    })
+</script>
+</html>
