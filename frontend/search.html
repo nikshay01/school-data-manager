@@ -15,7 +15,7 @@
     btn.addEventListener('click', async()=>{
     const field = document.getElementById('search').value.trim()
     try{
-    const Response = await fetch(`http://localhost:5000/api/students/update`)
+    const Response = await fetch(`http://localhost:5000/api/students/update?query=${encodeURIComponent(field)}`)
     const data= await Response.json();
     if (!Response.ok) {
         alert('student not found')
