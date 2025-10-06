@@ -36,7 +36,11 @@ app.post("/api/students", async (req, res) => {
 app.get("/api/students", async (req, res) => {
   const students = await Student.find();
   res.json(students);
+  console.log("data sent to frontend");
 });
+app.post("/api/students/update", async(req,res)=>{
+    const students = await Student.find();
+})
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

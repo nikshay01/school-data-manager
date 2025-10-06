@@ -12,10 +12,18 @@
 </body>
 <script>
     const btn = document.getElementById('srcbtn')
-    btn.addEventListener('click',()=>{
-    const field = document.getElementById('search').value
-
-        console.log(field,'   ',field.trim());
+    btn.addEventListener('click', async()=>{
+    const field = document.getElementById('search').value.trim()
+    try{
+    const Response = await fetch(`http://localhost:5000/api/students/update`)
+    const data= await Response.json();
+    if (!Response.ok) {
+        alert('student not found')
+        return;
+    }
+    console.log(Response);
+    console.log(data);
+}catch(e){console.log(e);}
     })
 </script>
 </html>
