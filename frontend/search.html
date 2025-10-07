@@ -21,7 +21,7 @@
           )}`
         );
         const data = await Response.json();
-        if (!Response.ok) {
+        if (!Response.ok || data === 0) {
           alert("student not found");
           return;
         }

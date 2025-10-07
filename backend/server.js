@@ -39,10 +39,20 @@ app.get("/api/students", async (req, res) => {
   console.log("data sent to frontend");
 });
 app.get("/api/students/update", async(req,res)=>{
+  // req came and got the wanted student
   console.log('request detected at update section\n');
     const students = await Student.find();
     const log = req.query.query
-   res.send(students)
+    let foundData = false
+    let newData =[]
+    students.forEach(element => {
+      if (element.srNo == log) {
+        newData.push(element)
+        foundData=true
+      }
+    });
+  foundData?res.send(newData):res.send(0)
+  
 
 })
 
