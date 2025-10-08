@@ -134,6 +134,7 @@
   const form = document.getElementById('studentForm');
   const tableBody = document.querySelector('#studentsTable tbody');
   const formError = document.getElementById('formError');
+  let editingId = null; // to track which student is being edited
 
   form.addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -168,22 +169,30 @@
     };
 
     try {
-      const res = await fetch('http://localhost:5000/api/students', {
-        method: 'POST',
+      const url = editingId
+        ? `http://localhost:5000/api/students/${editingId}`
+        : 'http://localhost:5000/api/students';
+      const method = editingId ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(student)
       });
-      if (!res.ok) throw new Error('Failed to add student');
+
+      if (!res.ok) throw new Error('Failed to submit');
 
       form.reset();
-      await loadStudents(); // refresh table after submission
+      editingId = null;
+      form.querySelector("button").textContent = "Add Student";
+      await loadStudents();
     } catch (err) {
       formError.textContent = 'Error submitting data!';
       console.error(err);
     }
   });
 
-  // Function to fetch all students and populate the table
+  // Fetch all students and show in table
   async function loadStudents() {
     tableBody.innerHTML = '';
     try {
@@ -212,18 +221,53 @@
             Discount: ${student.fees?.discount || 0}
           </td>
           <td>${student.concessionBy || ''}</td>
+          <td><button onclick="editStudent('${student._id}')">✏️ Edit</button></td>
         `;
         tableBody.appendChild(tr);
       });
     } catch (err) {
-      tableBody.innerHTML = `<tr><td colspan="12">Error loading data</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="13">Error loading data</td></tr>`;
       console.error(err);
     }
   }
 
-  // Load students on page load
+  // Fill form for editing
+  async function editStudent(id) {
+    try {
+      const res = await fetch(`http://localhost:5000/api/students/${id}`);
+      if (!res.ok) throw new Error('Student not found');
+      const student = await res.json();
+
+      document.getElementById('studentName').value = student.studentName || '';
+      document.getElementById('fatherName').value = student.fatherName || '';
+      document.getElementById('className').value = student.class || '';
+      document.getElementById('section').value = student.section || '';
+      document.getElementById('srNo').value = student.srNo || '';
+      document.getElementById('address').value = student.address || '';
+      document.getElementById('contact').value = student.contact || '';
+      document.getElementById('aadhar').value = student.aadhar || '';
+      document.getElementById('adDate').value = student.adDate ? student.adDate.split('T')[0] : '';
+      document.getElementById('dob').value = student.dob ? student.dob.split('T')[0] : '';
+      document.getElementById('penID').value = student.penID || '';
+      document.getElementById('adFee').value = student.fees?.adFee || 0;
+      document.getElementById('fee').value = student.fees?.fee || 0;
+      document.getElementById('bus').value = student.fees?.bus || 0;
+      document.getElementById('hostel').value = student.fees?.hostel || 0;
+      document.getElementById('discount').value = student.fees?.discount || 0;
+      document.getElementById('concessionBy').value = student.concessionBy || '';
+
+      editingId = id;
+      form.querySelector("button").textContent = "Update Student";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      alert('Error fetching student details');
+      console.error(err);
+    }
+  }
+
   window.onload = loadStudents;
 </script>
+
 
 </body>
 </html>
