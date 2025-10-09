@@ -5,10 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Student Manager</title>
 <style>
-    a{
-        color: black;
-        background-color: red;
-    }
   body {
     font-family: Arial, sans-serif;
     background: #f4f6f8;
@@ -26,12 +22,11 @@
     border-radius: 8px;
     margin-bottom: 30px;
     max-width: 700px;
-    margin-left: auto;
-    margin-right: auto;
+    margin: auto;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
   }
 
-  form input, form select {
+  input, select {
     width: 100%;
     padding: 10px;
     margin-bottom: 10px;
@@ -39,7 +34,7 @@
     border: 1px solid #ccc;
   }
 
-  form button {
+  button {
     padding: 10px 20px;
     border: none;
     background: #007BFF;
@@ -48,7 +43,7 @@
     cursor: pointer;
   }
 
-  form button:hover {
+  button:hover {
     background: #0056b3;
   }
 
@@ -66,209 +61,220 @@
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
   }
 
-  table th, table td {
+  th, td {
     padding: 12px;
     border-bottom: 1px solid #ddd;
-    text-align: left;
   }
 
-  table th {
+  th {
     background: #007BFF;
     color: #fff;
   }
 
-  table tr:hover {
+  tr:hover {
     background: #f1f1f1;
+  }
+
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 </style>
 </head>
 <body>
-    <a href="search.html">search</a>
+  <a href="search.html">search</a>
+  <h2>Student Manager</h2>
 
-<h2>Student Manager</h2>
+  <form id="studentForm">
+    <div class="error" id="formError"></div>
+    <input type="text" id="studentName" placeholder="Student Name *" required>
+    <input type="text" id="fatherName" placeholder="Father Name">
+    <input type="text" id="className" placeholder="Class">
+    <input type="text" id="section" placeholder="Section">
+    <input type="text" id="srNo" placeholder="SR No">
+    <input type="text" id="address" placeholder="Address">
+    <input type="number" id="contact" placeholder="Contact">
+    <input type="number" id="aadhar" placeholder="Aadhar">
+    <input type="date" id="adDate" placeholder="Admission Date">
+    <input type="date" id="dob" placeholder="DOB">
+    <input type="text" id="penID" placeholder="Pen ID">
+    <input type="text" id="apaarID" placeholder="APAAR ID">
+    <div class="checkbox-group">
+      <label><input type="checkbox" id="leftSchool"> Left School?</label>
+      <input type="text" id="tcNumber" placeholder="TC Number (if left)">
+    </div>
+    <div class="checkbox-group">
+      <label><input type="checkbox" id="udiseRemoved"> UDISE Removed?</label>
+    </div>
+    <input type="number" id="adFee" placeholder="Admission Fee">
+    <input type="number" id="fee" placeholder="Tuition Fee">
+    <input type="number" id="bus" placeholder="Bus Fee">
+    <input type="number" id="hostel" placeholder="Hostel Fee">
+    <input type="number" id="discount" placeholder="Discount">
+    <input type="text" id="concessionBy" placeholder="Concession By">
+    <button type="submit">Add Student</button>
+  </form>
 
-<form id="studentForm">
-  <div class="error" id="formError"></div>
-  <input type="text" id="studentName" placeholder="Student Name *" required>
-  <input type="text" id="fatherName" placeholder="Father Name">
-  <input type="text" id="className" placeholder="Class">
-  <input type="text" id="section" placeholder="Section">
-  <input type="text" id="srNo" placeholder="SR No">
-  <input type="text" id="address" placeholder="Address">
-  <input type="number" id="contact" placeholder="Contact">
-  <input type="number" id="aadhar" placeholder="Aadhar">
-  <input type="date" id="adDate" placeholder="Admission Date">
-  <input type="date" id="dob" placeholder="DOB">
-  <input type="text" id="penID" placeholder="Pen ID">
-  <input type="number" id="adFee" placeholder="Admission Fee">
-  <input type="number" id="fee" placeholder="Tuition Fee">
-  <input type="number" id="bus" placeholder="Bus Fee">
-  <input type="number" id="hostel" placeholder="Hostel Fee">
-  <input type="number" id="discount" placeholder="Discount">
-  <input type="text" id="concessionBy" placeholder="Concession By">
-  <button type="submit">Add Student</button>
-</form>
+  <table id="studentsTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Father</th>
+        <th>Class</th>
+        <th>Section</th>
+        <th>SR No</th>
+        <th>APAAR</th>
+        <th>Contact</th>
+        <th>Left?</th>
+        <th>TC</th>
+        <th>UDISE Removed</th>
+        <th>Fees</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-<table id="studentsTable">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Father Name</th>
-      <th>Class</th>
-      <th>Section</th>
-      <th>SR No</th>
-      <th>Contact</th>
-      <th>Aadhar</th>
-      <th>Admission Date</th>
-      <th>DOB</th>
-      <th>Pen ID</th>
-      <th>Fees</th>
-      <th>Concession By</th>
-    </tr>
-  </thead>
-  <tbody>
-    <!-- Student rows will appear here -->
-  </tbody>
-</table>
-<script>
-  const form = document.getElementById('studentForm');
-  const tableBody = document.querySelector('#studentsTable tbody');
-  const formError = document.getElementById('formError');
-  let editingId = null; // to track which student is being edited
+  <script>
+    const form = document.getElementById("studentForm");
+    const tableBody = document.querySelector("#studentsTable tbody");
+    const formError = document.getElementById("formError");
+    let editingId = null;
 
-  form.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    formError.textContent = '';
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      formError.textContent = "";
 
-    const studentName = document.getElementById('studentName').value.trim();
-    if (!studentName) {
-      formError.textContent = 'Student name is required!';
-      return;
-    }
-
-    const student = {
-      studentName,
-      fatherName: document.getElementById('fatherName').value || '',
-      class: document.getElementById('className').value || '',
-      section: document.getElementById('section').value || '',
-      srNo: document.getElementById('srNo').value || '',
-      address: document.getElementById('address').value || '',
-      contact: document.getElementById('contact').value || '',
-      aadhar: document.getElementById('aadhar').value || '',
-      adDate: document.getElementById('adDate').value || '',
-      dob: document.getElementById('dob').value || '',
-      penID: document.getElementById('penID').value || '',
-      fees: {
-        adFee: Number(document.getElementById('adFee').value) || 0,
-        fee: Number(document.getElementById('fee').value) || 0,
-        bus: Number(document.getElementById('bus').value) || 0,
-        hostel: Number(document.getElementById('hostel').value) || 0,
-        discount: Number(document.getElementById('discount').value) || 0,
-        concessionBy: document.getElementById('concessionBy').value || ''
+      const studentName = document.getElementById("studentName").value.trim();
+      if (!studentName) {
+        formError.textContent = "Student name is required!";
+        return;
       }
-      
-    };
 
-    try {
-      const url = editingId
-        ? `http://localhost:5000/api/students/${editingId}`
-        : 'http://localhost:5000/api/students';
-      const method = editingId ? 'PUT' : 'POST';
+      const student = {
+        studentName,
+        fatherName: document.getElementById("fatherName").value || "",
+        class: document.getElementById("className").value || "",
+        section: document.getElementById("section").value || "",
+        srNo: document.getElementById("srNo").value || "",
+        address: document.getElementById("address").value || "",
+        contact: Number(document.getElementById("contact").value) || 0,
+        aadhar: Number(document.getElementById("aadhar").value) || 0,
+        adDate: document.getElementById("adDate").value || null,
+        dob: document.getElementById("dob").value || null,
+        penID: document.getElementById("penID").value || "",
+        apaarID: document.getElementById("apaarID").value || "",
+        leftSchool: document.getElementById("leftSchool").checked,
+        tcNumber: document.getElementById("tcNumber").value || "",
+        udiseRemoved: document.getElementById("udiseRemoved").checked,
+        fees: {
+          adFee: Number(document.getElementById("adFee").value) || 0,
+          fee: Number(document.getElementById("fee").value) || 0,
+          bus: Number(document.getElementById("bus").value) || 0,
+          hostel: Number(document.getElementById("hostel").value) || 0,
+          discount: Number(document.getElementById("discount").value) || 0,
+          concessionBy: document.getElementById("concessionBy").value || "",
+        },
+      };
 
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(student)
-      });
+      try {
+        const url = editingId
+          ? `http://localhost:5000/api/students/${editingId}`
+          : "http://localhost:5000/api/students";
+        const method = editingId ? "PUT" : "POST";
 
-      if (!res.ok) throw new Error('Failed to submit');
+        const res = await fetch(url, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(student),
+        });
 
-      form.reset();
-      editingId = null;
-      form.querySelector("button").textContent = "Add Student";
-      await loadStudents();
-    } catch (err) {
-      formError.textContent = 'Error submitting data!';
-      console.error(err);
+        if (!res.ok) throw new Error("Failed to submit data");
+        form.reset();
+        editingId = null;
+        form.querySelector("button").textContent = "Add Student";
+        await loadStudents();
+      } catch (err) {
+        console.error(err);
+        formError.textContent = "Error submitting data!";
+      }
+    });
+
+    async function loadStudents() {
+      tableBody.innerHTML = "";
+      try {
+        const res = await fetch("http://localhost:5000/api/students");
+        const students = await res.json();
+
+        students.forEach((s) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${s.studentName}</td>
+            <td>${s.fatherName}</td>
+            <td>${s.class}</td>
+            <td>${s.section}</td>
+            <td>${s.srNo}</td>
+            <td>${s.apaarID}</td>
+            <td>${s.contact}</td>
+            <td>${s.leftSchool ? "✅" : "❌"}</td>
+            <td>${s.tcNumber}</td>
+            <td>${s.udiseRemoved ? "✅" : "❌"}</td>
+            <td>
+              Ad: ${s.fees.adFee}<br>
+              Fee: ${s.fees.fee}<br>
+              Bus: ${s.fees.bus}<br>
+              Hostel: ${s.fees.hostel}<br>
+              Disc: ${s.fees.discount}
+            </td>
+            <td><button onclick="editStudent('${s._id}')">✏️ Edit</button></td>
+          `;
+          tableBody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error(err);
+        tableBody.innerHTML = "<tr><td colspan='12'>Error loading data</td></tr>";
+      }
     }
-  });
 
-  // Fetch all students and show in table
-  async function loadStudents() {
-    tableBody.innerHTML = '';
-    try {
-      const res = await fetch('http://localhost:5000/api/students');
-      if (!res.ok) throw new Error('Failed to fetch students');
-      const students = await res.json();
+    async function editStudent(id) {
+      try {
+        const res = await fetch(`http://localhost:5000/api/students/${id}`);
+        if (!res.ok) throw new Error("Not found");
+        const s = await res.json();
 
-      students.forEach(student => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${student.studentName}</td>
-          <td>${student.fatherName || ''}</td>
-          <td>${student.class || ''}</td>
-          <td>${student.section || ''}</td>
-          <td>${student.srNo || ''}</td>
-          <td>${student.contact || ''}</td>
-          <td>${student.aadhar || ''}</td>
-          <td>${student.adDate ? new Date(student.adDate).toLocaleDateString('en-GB') : ''}</td>
-          <td>${student.dob ? new Date(student.dob).toLocaleDateString('en-GB') : ''}</td>
-          <td>${student.penID || ''}</td>
-          <td>
-            Admission: ${student.fees?.adFee || 0}<br>
-            Tuition: ${student.fees?.fee || 0}<br>
-            Bus: ${student.fees?.bus || 0}<br>
-            Hostel: ${student.fees?.hostel || 0}<br>
-            Discount: ${student.fees?.discount || 0}
-          </td>
-          <td>${student.fees.concessionBy || ''}</td>
-          <td><button onclick="editStudent('${student._id}')">✏️ Edit</button></td>
-        `;
-        tableBody.appendChild(tr);
-      });
-    } catch (err) {
-      tableBody.innerHTML = `<tr><td colspan="13">Error loading data</td></tr>`;
-      console.error(err);
+        document.getElementById("studentName").value = s.studentName;
+        document.getElementById("fatherName").value = s.fatherName;
+        document.getElementById("className").value = s.class;
+        document.getElementById("section").value = s.section;
+        document.getElementById("srNo").value = s.srNo;
+        document.getElementById("address").value = s.address;
+        document.getElementById("contact").value = s.contact;
+        document.getElementById("aadhar").value = s.aadhar;
+        document.getElementById("adDate").value = s.adDate?.split("T")[0] || "";
+        document.getElementById("dob").value = s.dob?.split("T")[0] || "";
+        document.getElementById("penID").value = s.penID;
+        document.getElementById("apaarID").value = s.apaarID;
+        document.getElementById("leftSchool").checked = s.leftSchool;
+        document.getElementById("tcNumber").value = s.tcNumber;
+        document.getElementById("udiseRemoved").checked = s.udiseRemoved;
+        document.getElementById("adFee").value = s.fees.adFee;
+        document.getElementById("fee").value = s.fees.fee;
+        document.getElementById("bus").value = s.fees.bus;
+        document.getElementById("hostel").value = s.fees.hostel;
+        document.getElementById("discount").value = s.fees.discount;
+        document.getElementById("concessionBy").value = s.fees.concessionBy;
+
+        editingId = id;
+        form.querySelector("button").textContent = "Update Student";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch (err) {
+        console.error(err);
+        alert("Error loading student");
+      }
     }
-  }
 
-  // Fill form for editing
-  async function editStudent(id) {
-    try {
-      const res = await fetch(`http://localhost:5000/api/students/${id}`);
-      if (!res.ok) throw new Error('Student not found');
-      const student = await res.json();
-
-      document.getElementById('studentName').value = student.studentName || '';
-      document.getElementById('fatherName').value = student.fatherName || '';
-      document.getElementById('className').value = student.class || '';
-      document.getElementById('section').value = student.section || '';
-      document.getElementById('srNo').value = student.srNo || '';
-      document.getElementById('address').value = student.address || '';
-      document.getElementById('contact').value = student.contact || '';
-      document.getElementById('aadhar').value = student.aadhar || '';
-      document.getElementById('adDate').value = student.adDate ? student.adDate.split('T')[0] : '';
-      document.getElementById('dob').value = student.dob ? student.dob.split('T')[0] : '';
-      document.getElementById('penID').value = student.penID || '';
-      document.getElementById('adFee').value = student.fees?.adFee || 0;
-      document.getElementById('fee').value = student.fees?.fee || 0;
-      document.getElementById('bus').value = student.fees?.bus || 0;
-      document.getElementById('hostel').value = student.fees?.hostel || 0;
-      document.getElementById('discount').value = student.fees?.discount || 0;
-      document.getElementById('concessionBy').value = student.fees.concessionBy || '';
-
-      editingId = id;
-      form.querySelector("button").textContent = "Update Student";
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (err) {
-      alert('Error fetching student details');
-      console.error(err);
-    }
-  }
-
-  window.onload = loadStudents;
-</script>
-
-
+    window.onload = loadStudents;
+  </script>
 </body>
 </html>

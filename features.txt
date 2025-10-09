@@ -1,0 +1,9 @@
+make an js scritpt to run on udise console to get sr no. and pen no. of all students of selected the classes
+same for apaar id
+make an format for admit card that can take data from db and fill it then make admit card for whole classes
+and other stuffs
+
+include features for shala darpan and other related portals like sso, paymanager etc 
+
+add filters and sorting for each column
+add mass addition for students or details like tc gone or not etc
