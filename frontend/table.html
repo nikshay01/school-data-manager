@@ -163,9 +163,10 @@
         fee: Number(document.getElementById('fee').value) || 0,
         bus: Number(document.getElementById('bus').value) || 0,
         hostel: Number(document.getElementById('hostel').value) || 0,
-        discount: Number(document.getElementById('discount').value) || 0
-      },
-      concessionBy: document.getElementById('concessionBy').value || ''
+        discount: Number(document.getElementById('discount').value) || 0,
+        concessionBy: document.getElementById('concessionBy').value || ''
+      }
+      
     };
 
     try {
@@ -220,7 +221,7 @@
             Hostel: ${student.fees?.hostel || 0}<br>
             Discount: ${student.fees?.discount || 0}
           </td>
-          <td>${student.concessionBy || ''}</td>
+          <td>${student.fees.concessionBy || ''}</td>
           <td><button onclick="editStudent('${student._id}')">✏️ Edit</button></td>
         `;
         tableBody.appendChild(tr);
@@ -254,7 +255,7 @@
       document.getElementById('bus').value = student.fees?.bus || 0;
       document.getElementById('hostel').value = student.fees?.hostel || 0;
       document.getElementById('discount').value = student.fees?.discount || 0;
-      document.getElementById('concessionBy').value = student.concessionBy || '';
+      document.getElementById('concessionBy').value = student.fees.concessionBy || '';
 
       editingId = id;
       form.querySelector("button").textContent = "Update Student";

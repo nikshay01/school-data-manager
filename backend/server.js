@@ -71,7 +71,20 @@ app.get("/api/students/find", async (req, res) => {
 
 
 // 🟢 PUT — Update student by ID (or query)
+// 🟢 GET — Fetch a single student by ID
+app.get("/api/students/:id", async (req, res) => {
+  try {
+    const student = await Student.findById(req.params.id);
+    if (!student) return res.status(404).json({ message: "Student not found" });
+    res.json(student);
+  } catch (err) {
+    console.error("❌ Error fetching student:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 app.put("/api/students/:id", async (req, res) => {
+  console.log("put request reached");
   try {
     const updated = await Student.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
