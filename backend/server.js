@@ -34,9 +34,12 @@ app.post("/api/students", async (req, res) => {
 
 
 // 🟢 GET — All students
-app.get("/api/students", async (req, res) => {
+app.get("/api/students/:id", async (req, res) => {
   try {
-    const students = await Student.find();
+    const className = req.params.id
+    console.log(className);
+    const query = className==0?{}:{class:className}
+    const students = await Student.find(query);
     res.json(students);
     console.log("✅ All students sent to frontend");
   } catch (err) {
@@ -129,6 +132,8 @@ app.delete("/api/students/dl/:id", async (req, res) => {
   }
  })
 
+
+ 
 // 🟢 Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

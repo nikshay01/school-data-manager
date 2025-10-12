@@ -124,7 +124,22 @@
       <input type="text" id="concessionBy" placeholder="Concession By" />
       <button type="submit">Add Student</button>
     </form>
-
+    <select name="class" id="classSorter">
+      <option value="0">all</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+      <option value="7">7</option>
+      <option value="8">8</option>
+      <option value="9">9</option>
+      <option value="10">10</option>
+      <option value="11">11</option>
+      <option value="12">12</option>
+    </select>
+    <button id="std-btn" onclick="loadStudents()">load students</button>
     <table id="studentsTable">
       <thead>
         <tr>
@@ -213,7 +228,9 @@
       async function loadStudents() {
         tableBody.innerHTML = "";
         try {
-          const res = await fetch("http://localhost:5000/api/students");
+          const className = document.getElementById('classSorter').value;
+          console.log(className);
+          const res = await fetch(`http://localhost:5000/api/students/${className}`);
           const students = await res.json();
 
           students.forEach((s) => {
