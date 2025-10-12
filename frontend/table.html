@@ -1,215 +1,224 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Student Manager</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #f4f6f8;
-    padding: 20px;
-  }
-
-  h2 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-
-  form {
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 30px;
-    max-width: 700px;
-    margin: auto;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  }
-
-  input, select {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-  }
-
-  button {
-    padding: 10px 20px;
-    border: none;
-    background: #007BFF;
-    color: #fff;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
-  button:hover {
-    background: #0056b3;
-  }
-
-  .error {
-    color: red;
-    margin-bottom: 10px;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  }
-
-  th, td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
-  }
-
-  th {
-    background: #007BFF;
-    color: #fff;
-  }
-
-  tr:hover {
-    background: #f1f1f1;
-  }
-
-  .checkbox-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-</style>
-</head>
-<body>
-  <a href="search.html">search</a>
-  <h2>Student Manager</h2>
-
-  <form id="studentForm">
-    <div class="error" id="formError"></div>
-    <input type="text" id="studentName" placeholder="Student Name *" required>
-    <input type="text" id="fatherName" placeholder="Father Name">
-    <input type="text" id="className" placeholder="Class">
-    <input type="text" id="section" placeholder="Section">
-    <input type="text" id="srNo" placeholder="SR No">
-    <input type="text" id="address" placeholder="Address">
-    <input type="number" id="contact" placeholder="Contact">
-    <input type="number" id="aadhar" placeholder="Aadhar">
-    <input type="date" id="adDate" placeholder="Admission Date">
-    <input type="date" id="dob" placeholder="DOB">
-    <input type="text" id="penID" placeholder="Pen ID">
-    <input type="text" id="apaarID" placeholder="APAAR ID">
-    <div class="checkbox-group">
-      <label><input type="checkbox" id="leftSchool"> Left School?</label>
-      <input type="text" id="tcNumber" placeholder="TC Number (if left)">
-    </div>
-    <div class="checkbox-group">
-      <label><input type="checkbox" id="udiseRemoved"> UDISE Removed?</label>
-    </div>
-    <input type="number" id="adFee" placeholder="Admission Fee">
-    <input type="number" id="fee" placeholder="Tuition Fee">
-    <input type="number" id="bus" placeholder="Bus Fee">
-    <input type="number" id="hostel" placeholder="Hostel Fee">
-    <input type="number" id="discount" placeholder="Discount">
-    <input type="text" id="concessionBy" placeholder="Concession By">
-    <button type="submit">Add Student</button>
-  </form>
-
-  <table id="studentsTable">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Father</th>
-        <th>Class</th>
-        <th>Section</th>
-        <th>SR No</th>
-        <th>APAAR</th>
-        <th>Contact</th>
-        <th>Left?</th>
-        <th>TC</th>
-        <th>UDISE Removed</th>
-        <th>Fees</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <script>
-    const form = document.getElementById("studentForm");
-    const tableBody = document.querySelector("#studentsTable tbody");
-    const formError = document.getElementById("formError");
-    let editingId = null;
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      formError.textContent = "";
-
-      const studentName = document.getElementById("studentName").value.trim();
-      if (!studentName) {
-        formError.textContent = "Student name is required!";
-        return;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Manager</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f8;
+        padding: 20px;
       }
 
-      const student = {
-        studentName,
-        fatherName: document.getElementById("fatherName").value || "",
-        class: document.getElementById("className").value || "",
-        section: document.getElementById("section").value || "",
-        srNo: document.getElementById("srNo").value || "",
-        address: document.getElementById("address").value || "",
-        contact: Number(document.getElementById("contact").value) || 0,
-        aadhar: Number(document.getElementById("aadhar").value) || 0,
-        adDate: document.getElementById("adDate").value || null,
-        dob: document.getElementById("dob").value || null,
-        penID: document.getElementById("penID").value || "",
-        apaarID: document.getElementById("apaarID").value || "",
-        leftSchool: document.getElementById("leftSchool").checked,
-        tcNumber: document.getElementById("tcNumber").value || "",
-        udiseRemoved: document.getElementById("udiseRemoved").checked,
-        fees: {
-          adFee: Number(document.getElementById("adFee").value) || 0,
-          fee: Number(document.getElementById("fee").value) || 0,
-          bus: Number(document.getElementById("bus").value) || 0,
-          hostel: Number(document.getElementById("hostel").value) || 0,
-          discount: Number(document.getElementById("discount").value) || 0,
-          concessionBy: document.getElementById("concessionBy").value || "",
-        },
-      };
-
-      try {
-        const url = editingId
-          ? `http://localhost:5000/api/students/${editingId}`
-          : "http://localhost:5000/api/students";
-        const method = editingId ? "PUT" : "POST";
-
-        const res = await fetch(url, {
-          method,
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(student),
-        });
-
-        if (!res.ok) throw new Error("Failed to submit data");
-        form.reset();
-        editingId = null;
-        form.querySelector("button").textContent = "Add Student";
-        await loadStudents();
-      } catch (err) {
-        console.error(err);
-        formError.textContent = "Error submitting data!";
+      h2 {
+        text-align: center;
+        margin-bottom: 20px;
       }
-    });
 
-    async function loadStudents() {
-      tableBody.innerHTML = "";
-      try {
-        const res = await fetch("http://localhost:5000/api/students");
-        const students = await res.json();
+      form {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        max-width: 700px;
+        margin: auto;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
 
-        students.forEach((s) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
+      input,
+      select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+
+      button {
+        padding: 10px 20px;
+        border: none;
+        background: #007bff;
+        color: #fff;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #0056b3;
+      }
+
+      .error {
+        color: red;
+        margin-bottom: 10px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      th,
+      td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+      }
+
+      th {
+        background: #007bff;
+        color: #fff;
+      }
+
+      tr:hover {
+        background: #f1f1f1;
+      }
+
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="search.html">search</a>
+    <h2>Student Manager</h2>
+
+    <form id="studentForm">
+      <div class="error" id="formError"></div>
+      <input
+        type="text"
+        id="studentName"
+        placeholder="Student Name *"
+        required
+      />
+      <input type="text" id="fatherName" placeholder="Father Name" />
+      <input type="text" id="className" placeholder="Class" />
+      <input type="text" id="section" placeholder="Section" />
+      <input type="text" id="srNo" placeholder="SR No" />
+      <input type="text" id="address" placeholder="Address" />
+      <input type="number" id="contact" placeholder="Contact" />
+      <input type="number" id="aadhar" placeholder="Aadhar" />
+      <input type="date" id="adDate" placeholder="Admission Date" />
+      <input type="date" id="dob" placeholder="DOB" />
+      <input type="text" id="penID" placeholder="Pen ID" />
+      <input type="text" id="apaarID" placeholder="APAAR ID" />
+      <div class="checkbox-group">
+        <label><input type="checkbox" id="leftSchool" /> Left School?</label>
+        <input type="text" id="tcNumber" placeholder="TC Number (if left)" />
+      </div>
+      <div class="checkbox-group">
+        <label
+          ><input type="checkbox" id="udiseRemoved" /> UDISE Removed?</label
+        >
+      </div>
+      <input type="number" id="adFee" placeholder="Admission Fee" />
+      <input type="number" id="fee" placeholder="Tuition Fee" />
+      <input type="number" id="bus" placeholder="Bus Fee" />
+      <input type="number" id="hostel" placeholder="Hostel Fee" />
+      <input type="number" id="discount" placeholder="Discount" />
+      <input type="text" id="concessionBy" placeholder="Concession By" />
+      <button type="submit">Add Student</button>
+    </form>
+
+    <table id="studentsTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Father</th>
+          <th>Class</th>
+          <th>Section</th>
+          <th>SR No</th>
+          <th>APAAR</th>
+          <th>Contact</th>
+          <th>Left?</th>
+          <th>TC</th>
+          <th>UDISE Removed</th>
+          <th>Fees</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <script>
+      const form = document.getElementById("studentForm");
+      const tableBody = document.querySelector("#studentsTable tbody");
+      const formError = document.getElementById("formError");
+      let editingId = null;
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        formError.textContent = "";
+
+        const studentName = document.getElementById("studentName").value.trim();
+        if (!studentName) {
+          formError.textContent = "Student name is required!";
+          return;
+        }
+
+        const student = {
+          studentName,
+          fatherName: document.getElementById("fatherName").value || "",
+          class: document.getElementById("className").value || "",
+          section: document.getElementById("section").value || "",
+          srNo: document.getElementById("srNo").value || "",
+          address: document.getElementById("address").value || "",
+          contact: Number(document.getElementById("contact").value) || 0,
+          aadhar: Number(document.getElementById("aadhar").value) || 0,
+          adDate: document.getElementById("adDate").value || null,
+          dob: document.getElementById("dob").value || null,
+          penID: document.getElementById("penID").value || "",
+          apaarID: document.getElementById("apaarID").value || "",
+          leftSchool: document.getElementById("leftSchool").checked,
+          tcNumber: document.getElementById("tcNumber").value || "",
+          udiseRemoved: document.getElementById("udiseRemoved").checked,
+          fees: {
+            adFee: Number(document.getElementById("adFee").value) || 0,
+            fee: Number(document.getElementById("fee").value) || 0,
+            bus: Number(document.getElementById("bus").value) || 0,
+            hostel: Number(document.getElementById("hostel").value) || 0,
+            discount: Number(document.getElementById("discount").value) || 0,
+            concessionBy: document.getElementById("concessionBy").value || "",
+          },
+        };
+
+        try {
+          const url = editingId
+            ? `http://localhost:5000/api/students/${editingId}`
+            : "http://localhost:5000/api/students";
+          const method = editingId ? "PUT" : "POST";
+
+          const res = await fetch(url, {
+            method,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(student),
+          });
+
+          if (!res.ok) throw new Error("Failed to submit data");
+          form.reset();
+          editingId = null;
+          form.querySelector("button").textContent = "Add Student";
+          await loadStudents();
+        } catch (err) {
+          console.error(err);
+          formError.textContent = "Error submitting data!";
+        }
+      });
+
+      async function loadStudents() {
+        tableBody.innerHTML = "";
+        try {
+          const res = await fetch("http://localhost:5000/api/students");
+          const students = await res.json();
+
+          students.forEach((s) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
             <td>${s.studentName}</td>
             <td>${s.fatherName}</td>
             <td>${s.class}</td>
@@ -228,53 +237,94 @@
               Disc: ${s.fees.discount}
             </td>
             <td><button onclick="editStudent('${s._id}')">✏️ Edit</button></td>
+            <td><button onclick="deleteStudent('${
+              s._id
+            }')">🗑️ delete student</button></td>
           `;
-          tableBody.appendChild(tr);
-        });
-      } catch (err) {
-        console.error(err);
-        tableBody.innerHTML = "<tr><td colspan='12'>Error loading data</td></tr>";
+            tableBody.appendChild(tr);
+          });
+        } catch (err) {
+          console.error(err);
+          tableBody.innerHTML =
+            "<tr><td colspan='12'>Error loading data</td></tr>";
+        }
       }
-    }
-
-    async function editStudent(id) {
-      try {
-        const res = await fetch(`http://localhost:5000/api/students/${id}`);
-        if (!res.ok) throw new Error("Not found");
-        const s = await res.json();
-
-        document.getElementById("studentName").value = s.studentName;
-        document.getElementById("fatherName").value = s.fatherName;
-        document.getElementById("className").value = s.class;
-        document.getElementById("section").value = s.section;
-        document.getElementById("srNo").value = s.srNo;
-        document.getElementById("address").value = s.address;
-        document.getElementById("contact").value = s.contact;
-        document.getElementById("aadhar").value = s.aadhar;
-        document.getElementById("adDate").value = s.adDate?.split("T")[0] || "";
-        document.getElementById("dob").value = s.dob?.split("T")[0] || "";
-        document.getElementById("penID").value = s.penID;
-        document.getElementById("apaarID").value = s.apaarID;
-        document.getElementById("leftSchool").checked = s.leftSchool;
-        document.getElementById("tcNumber").value = s.tcNumber;
-        document.getElementById("udiseRemoved").checked = s.udiseRemoved;
-        document.getElementById("adFee").value = s.fees.adFee;
-        document.getElementById("fee").value = s.fees.fee;
-        document.getElementById("bus").value = s.fees.bus;
-        document.getElementById("hostel").value = s.fees.hostel;
-        document.getElementById("discount").value = s.fees.discount;
-        document.getElementById("concessionBy").value = s.fees.concessionBy;
-
-        editingId = id;
-        form.querySelector("button").textContent = "Update Student";
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      } catch (err) {
-        console.error(err);
-        alert("Error loading student");
+      async function deleteStudent(id) {
+        try{
+        const pass = prompt("password for deletion")
+        console.log(pass);
+        const Resp = await fetch(`http://localhost:5000/api/dlpass/${pass}`)
+        const Responsee = await Resp.json();
+        if (!Resp.ok) throw new Error("request issue")
+        console.log(Responsee.message);
+        if (!Responsee.message) {
+          console.log('oji galt pass dale ho tussi');
+          return;
+        }
+      
+      }catch(e){
+        console.log(e);
       }
-    }
+        try {
+          const res = await fetch(
+            `http://localhost:5000/api/students/dl/${id}`,
+            {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+                // Add any authorization token if needed
+                Authorization: "Bearer your-token-here",
+              },
+            }
+          );
+          if (!res.ok) throw new Error("Not found");
+          const s = await res.json();
+          alert(s.message);
+          window.location.reload();
+        } catch (e) {
+          alert(e);
+          console.log("error:", e);
+        }
+      }
+      async function editStudent(id) {
+        try {
+          const res = await fetch(`http://localhost:5000/api/students/${id}`);
+          if (!res.ok) throw new Error("Not found");
+          const s = await res.json();
 
-    window.onload = loadStudents;
-  </script>
-</body>
+          document.getElementById("studentName").value = s.studentName;
+          document.getElementById("fatherName").value = s.fatherName;
+          document.getElementById("className").value = s.class;
+          document.getElementById("section").value = s.section;
+          document.getElementById("srNo").value = s.srNo;
+          document.getElementById("address").value = s.address;
+          document.getElementById("contact").value = s.contact;
+          document.getElementById("aadhar").value = s.aadhar;
+          document.getElementById("adDate").value =
+            s.adDate?.split("T")[0] || "";
+          document.getElementById("dob").value = s.dob?.split("T")[0] || "";
+          document.getElementById("penID").value = s.penID;
+          document.getElementById("apaarID").value = s.apaarID;
+          document.getElementById("leftSchool").checked = s.leftSchool;
+          document.getElementById("tcNumber").value = s.tcNumber;
+          document.getElementById("udiseRemoved").checked = s.udiseRemoved;
+          document.getElementById("adFee").value = s.fees.adFee;
+          document.getElementById("fee").value = s.fees.fee;
+          document.getElementById("bus").value = s.fees.bus;
+          document.getElementById("hostel").value = s.fees.hostel;
+          document.getElementById("discount").value = s.fees.discount;
+          document.getElementById("concessionBy").value = s.fees.concessionBy;
+
+          editingId = id;
+          form.querySelector("button").textContent = "Update Student";
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } catch (err) {
+          console.error(err);
+          alert("Error loading student");
+        }
+      }
+
+      window.onload = loadStudents;
+    </script>
+  </body>
 </html>

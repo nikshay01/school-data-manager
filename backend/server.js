@@ -98,17 +98,36 @@ app.put("/api/students/:id", async (req, res) => {
 
 
 // 🟢 (Optional) DELETE — Remove a student
-app.delete("/api/students/:id", async (req, res) => {
+app.delete("/api/students/dl/:id", async (req, res) => {
+  console.log('request reached for deletion');
   try {
     const deleted = await Student.findByIdAndDelete(req.params.id);
+    // console.log(deleted);
     if (!deleted) return res.status(404).json({ message: "Student not found" });
     res.json({ message: "Student deleted successfully" });
+    console.log('student deleted');
   } catch (err) {
     console.error("❌ Error deleting student:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
-
+ // password check
+ app.get('/api/dlpass/:id', async (req,res)=>{
+  console.log('req reached for deletionnnnn');
+  try {
+    const id = req.params.id
+    console.log(id);
+    if (id==123321) {
+      res.send({message:true})
+      console.log('password has arrived and is correct');
+    }else{
+      res.json({message:false})
+      console.log('wrong passworddd');
+    }
+  } catch (error) {
+    console.log(error);
+  }
+ })
 
 // 🟢 Start server
 const PORT = process.env.PORT || 5000;
