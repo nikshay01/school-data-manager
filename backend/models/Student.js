@@ -9,11 +9,12 @@ const paymentSchema = new mongoose.Schema({
 const studentSchema = new mongoose.Schema({
   studentName: { type: String, required: true },
   fatherName: { type: String, default: "" },
-  motherName: { type: String, default: "" },
+  // motherName: { type: String, default: "" },
   class: { type: String, default: "" },
   section: { type: String, default: "" },
   srNo: { type: String, default: "" },
   address: { type: String, default: "" },
+  State: { type: String, default: "" },
   contact: { type: Number, default: 0 },
   aadhar: { type: Number, default: 0 },
   adDate: { type: Date, default: null },
@@ -23,6 +24,7 @@ const studentSchema = new mongoose.Schema({
   leftSchool: { type: Boolean, default: false }, // new field
   tcNumber: { type: String, default: "" },       // new field, optional
   udiseRemoved: { type: Boolean, default: false }, // new field
+  leftDate:{type: Date, default: null},
   fees: {
     adFee: { type: Number, default: 0 },
     fee: { type: Number, default: 0 },
