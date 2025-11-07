@@ -7,3 +7,8 @@ include features for shala darpan and other related portals like sso, paymanager
 
 add filters and sorting for each column
 add mass addition for students or details like tc gone or not etc
+
+add field in
+
+ADD SOMETHING TO SEND NOTIFICATION TO PRINCIPAL WHENEVER AN FEE IS EDITED
+AND GIVE AN TABLE OF FEE ADDED TO THE DB FOR DAILY TO THE PRINCIPAL

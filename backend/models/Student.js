@@ -9,6 +9,7 @@ const paymentSchema = new mongoose.Schema({
 const studentSchema = new mongoose.Schema({
   studentName: { type: String, required: true },
   fatherName: { type: String, default: "" },
+  motherName: { type: String, default: "" },
   class: { type: String, default: "" },
   section: { type: String, default: "" },
   srNo: { type: String, default: "" },

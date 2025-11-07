@@ -1,35 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body>
-    <a href="table.html">table</a><br /><br /><br />
-    <input type="text" id="search" placeholder="srNo" /><br /><br />
-    <button id="srcbtn">search</button>
-  </body>
-  <script>
-    const btn = document.getElementById("srcbtn");
-    btn.addEventListener("click", async () => {
-      const field = document.getElementById("search").value.trim();
-      try {
-        const Response = await fetch(
-          `http://localhost:5000/api/students/update?query=${encodeURIComponent(
-            field
-          )}`
-        );
-        const data = await Response.json();
-        if (!Response.ok || data === 0) {
-          alert("student not found");
-          return;
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genie Animation</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #f0f0f0;
         }
-        console.log(Response);
-        console.log(data);
-      } catch (e) {
-        console.log(e);
-      }
-    });
-  </script>
+        #genieButton {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 10;
+        }
+        #genieSquare {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+        }
+        #squarePolygon {
+            fill: blue;
+            stroke: none;
+        }
+    </style>
+</head>
+<body>
+    <button id="genieButton">Genie</button>
+    <svg id="genieSquare">
+        <polygon id="squarePolygon" points="0,0 0,0 0,0 0,0"></polygon>
+    </svg>
+
+    <script>
+        try {
+            const button = document.getElementById('genieButton');
+            const svg = document.getElementById('genieSquare');
+            const polygon = document.getElementById('squarePolygon');
+
+            // Constants
+            const initialSize = 10;
+            const finalSize = 400;
+            const amplitude = 50;
+            const duration = 1000;
+            const delay = 0.4; // smoother delay (0.9 was too harsh)
+
+            // Phases for sine wave (different for each corner)
+            const phases = [0, Math.PI / 2, Math.PI, 3 * Math.PI / 2];
+
+            let isExpanded = false;
+            let buttonRect = button.getBoundingClientRect();
+            let screenCenterX = window.innerWidth / 2;
+            let screenCenterY = window.innerHeight / 2;
+            let buttonCenterX = buttonRect.left + buttonRect.width / 2;
+            let buttonCenterY = buttonRect.top + buttonRect.height / 2;
+
+            // Initial positions (compressed square at button center)
+            let startPositions = [
+                { x: buttonCenterX - initialSize / 2, y: buttonCenterY - initialSize / 2 }, // top-left
+                { x: buttonCenterX + initialSize / 2, y: buttonCenterY - initialSize / 2 }, // top-right
+                { x: buttonCenterX + initialSize / 2, y: buttonCenterY + initialSize / 2 }, // bottom-right
+                { x: buttonCenterX - initialSize / 2, y: buttonCenterY + initialSize / 2 }  // bottom-left
+            ];
+
+            // Final positions (square at screen center)
+            let endPositions = [
+                { x: screenCenterX - finalSize / 2, y: screenCenterY - finalSize / 2 }, // top-left
+                { x: screenCenterX + finalSize / 2, y: screenCenterY - finalSize / 2 }, // top-right
+                { x: screenCenterX + finalSize / 2, y: screenCenterY + finalSize / 2 }, // bottom-right
+                { x: screenCenterX - finalSize / 2, y: screenCenterY + finalSize / 2 }  // bottom-left
+            ];
+
+            // Linear interpolation
+            function lerp(a, b, t) {
+                return a + (b - a) * t;
+            }
+
+            // Sine lerp for wavy motion
+            function sineLerp(a, b, t, amp, phase) {
+                return lerp(a, b, t) + Math.sin(t * Math.PI + phase) * amp * (1 - t);
+            }
+
+            // Smooth easing (ease-in-out)
+            function easeInOut(t) {
+                return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+            }
+
+            // Update positions and animate
+            function animate(expand) {
+                console.log('Starting animation:', expand ? 'expand' : 'retract');
+                const startTime = performance.now();
+
+                function step(currentTime) {
+                    try {
+                        const elapsed = currentTime - startTime;
+                        let t = Math.min(elapsed / duration, 1);
+
+                        let points = [];
+                        for (let i = 0; i < 4; i++) {
+                            let p = expand ? t : (1 - t);
+
+                            // Delay for bottom corners (indices 2 and 3)
+                            if (i >= 2) {
+                                if (t < delay) p = 0;
+                                else p = (t - delay) / (1 - delay); // normalize progress
+                            }
+
+                            p = Math.max(0, Math.min(1, p));
+                            p = easeInOut(p); // apply easing for smooth start/stop
+
+                            let startX = startPositions[i].x;
+                            let startY = startPositions[i].y;
+                            let endX = endPositions[i].x;
+                            let endY = endPositions[i].y;
+
+                            let newX = sineLerp(startX, endX, p, amplitude, phases[i]);
+                            let newY = sineLerp(startY, endY, p, amplitude, phases[i]);
+                            points.push(`${newX},${newY}`);
+                        }
+
+                        polygon.setAttribute('points', points.join(' '));
+
+                        if (t < 1) {
+                            requestAnimationFrame(step);
+                        } else {
+                            console.log('Animation complete');
+                        }
+                    } catch (error) {
+                        console.error('Error in animation step:', error);
+                    }
+                }
+                requestAnimationFrame(step);
+            }
+
+            // Button click handler
+            button.addEventListener('click', () => {
+                try {
+                    console.log('Button clicked, isExpanded:', isExpanded);
+                    animate(!isExpanded);
+                    isExpanded = !isExpanded;
+                } catch (error) {
+                    console.error('Error in button click:', error);
+                }
+            });
+
+            // Update positions on resize for responsiveness
+            window.addEventListener('resize', () => {
+                try {
+                    buttonRect = button.getBoundingClientRect();
+                    screenCenterX = window.innerWidth / 2;
+                    screenCenterY = window.innerHeight / 2;
+                    buttonCenterX = buttonRect.left + buttonRect.width / 2;
+                    buttonCenterY = buttonRect.top + buttonRect.height / 2;
+                    startPositions = [
+                        { x: buttonCenterX - initialSize / 2, y: buttonCenterY - initialSize / 2 },
+                        { x: buttonCenterX + initialSize / 2, y: buttonCenterY - initialSize / 2 },
+                        { x: buttonCenterX + initialSize / 2, y: buttonCenterY + initialSize / 2 },
+                        { x: buttonCenterX - initialSize / 2, y: buttonCenterY + initialSize / 2 }
+                    ];
+                    endPositions = [
+                        { x: screenCenterX - finalSize / 2, y: screenCenterY - finalSize / 2 },
+                        { x: screenCenterX + finalSize / 2, y: screenCenterY - finalSize / 2 },
+                        { x: screenCenterX + finalSize / 2, y: screenCenterY + finalSize / 2 },
+                        { x: screenCenterX - finalSize / 2, y: screenCenterY + finalSize / 2 }
+                    ];
+                    console.log('Positions updated on resize');
+                } catch (error) {
+                    console.error('Error on resize:', error);
+                }
+            });
+        } catch (error) {
+            console.error('Error initializing script:', error);
+        }
+    </script>
+</body>
 </html>
