@@ -1,7 +1,16 @@
 .login-card{
-    display: flex;
-    position: absolute;
+
+    align-items: center;
     width: 456.52px;
     height: 429.05px;
     background-color: aqua;
+}
+.login-body{
+    display: flex;
+    position: absolute;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+    background-color: red;
+    /* z-index: 0; */
 }

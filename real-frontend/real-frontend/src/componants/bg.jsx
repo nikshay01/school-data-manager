@@ -4,6 +4,7 @@ import "../index.css";
 export default function Bg() {
   return (
     <>
+    <span className="backdrop-div"> </span>
     <div className="blob-bg">
         
       <svg
