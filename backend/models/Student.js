@@ -25,6 +25,7 @@ const studentSchema = new mongoose.Schema({
   tcNumber: { type: String, default: "" },       // new field, optional
   udiseRemoved: { type: Boolean, default: false }, // new field
   leftDate:{type: Date, default: null},
+  studentPhoto:{type: Boolean, default: null},// depends on if we have an local server of other
   fees: {
     adFee: { type: Number, default: 0 },
     fee: { type: Number, default: 0 },
