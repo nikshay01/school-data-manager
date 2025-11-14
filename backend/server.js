@@ -37,7 +37,7 @@ app.post("/api/students", async (req, res) => {
 app.get("/api/students/:id", async (req, res) => {
   try {
     const className = req.params.id
-    console.log(className);
+    console.log(className,"CLASSNAME");
     const query = className==0?{}:{class:className}
     const students = await Student.find(query);
     res.json(students);
@@ -71,7 +71,7 @@ app.get("/api/students/update", async(req,res)=>{
 
 // 🟢 PUT — Update student by ID (or query)
 // 🟢 GET — Fetch a single student by ID
-app.get("/api/students/:id", async (req, res) => {
+app.get("/api/students/singlestudent/:id", async (req, res) => {
   try {
     const student = await Student.findById(req.params.id);
     if (!student) return res.status(404).json({ message: "Student not found" });
