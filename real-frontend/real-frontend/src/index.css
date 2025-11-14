@@ -1,0 +1,114 @@
+body{
+    background-color: black;
+}
+.backdrop-div{
+    backdrop-filter: blur(200px);
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    position: absolute;
+    z-index: 0;
+}.blob-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.blob {
+  position: absolute;
+  transform-origin: center;
+  opacity: 0.8;
+}
+
+/* Individual blob animations */
+.blob-1 {
+  top: 10%;
+  left: 5%;
+  width: 400px;
+  animation: float1 8s ease-in-out infinite;
+}
+
+.blob-2 {
+  top: 60%;
+  left: 10%;
+  width: 500px;
+  animation: float2 8s ease-in-out infinite;
+}
+
+.blob-3 {
+  top: 20%;
+  left: 70%;
+  width: 350px;
+  animation: float3 8s ease-in-out infinite;
+}
+
+.blob-4 {
+  top: 70%;
+  left: 60%;
+  width: 450px;
+  animation: float4 8s ease-in-out infinite;
+}
+
+.blob-5 {
+  top: 30%;
+  left: 40%;
+  width: 300px;
+  animation: float5 8s ease-in-out infinite;
+}
+
+.blob-6 {
+  top: 50%;
+  left: 80%;
+  width: 400px;
+  animation: float6 8s ease-in-out infinite;
+}
+
+/* Different animations for each blob */
+@keyframes float1 {
+  0% { transform: translate(0,0) scale(1); }
+  25% { transform: translate(90px, -20px) scale(1.05); }
+  50% { transform: translate(-40px, 30px) scale(1.1); }
+  75% { transform: translate(20px, 40px) scale(1.05); }
+  100% { transform: translate(0,0) scale(1); }
+}
+
+@keyframes float2 {
+  0% { transform: translate(0,0) scale(1); }
+  25% { transform: translate(-60px, 30px) scale(1.1); }
+  50% { transform: translate(90px, -20px) scale(1.05); }
+  75% { transform: translate(-30px, 50px) scale(1.1); }
+  100% { transform: translate(0,0) scale(1); }
+}
+
+@keyframes float3 {
+  0% { transform: translate(0,0) scale(1); }
+  25% { transform: translate(70px, 50px) scale(1.05); }
+  50% { transform: translate(-60px, -40px) scale(1.1); }
+  75% { transform: translate(0px, -20px) scale(1.05); }
+  100% { transform: translate(0,0) scale(1); }
+}
+
+@keyframes float4 {
+  0% { transform: translate(0,0) scale(1); }
+  25% { transform: translate(-50px, -50px) scale(1.1); }
+  50% { transform: translate(60px, 40px) scale(1.05); }
+  75% { transform: translate(-3px, 30px) scale(1.1); }
+  100% { transform: translate(0,0) scale(1); }
+}
+
+@keyframes float5 {
+  0% { transform: translate(0,0) scale(1); }
+  25% { transform: translate(40px, 20px) scale(1.05); }
+  50% { transform: translate(-50px, -90px) scale(1.1); }
+  75% { transform: translate(20px, -40px) scale(1.05); }
+  100% { transform: translate(0,0) scale(1); }
+}
+
+@keyframes float6 {
+  0% { transform: translate(0,0) scale(1); }
+  25% { transform: translate(-40px, 0px) scale(1.1); }
+  50% { transform: translate(30px, -30px) scale(1.05); }
+  75% { transform: translate(-20px, 20px) scale(1.1); }
+  100% { transform: translate(0,0) scale(1); }
+}
