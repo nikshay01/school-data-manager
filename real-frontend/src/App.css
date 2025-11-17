@@ -1,16 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Irish+Grover&display=swap');
 .login-card{
-
+display: flex;
+flex-direction: column;
     align-items: center;
     width: 456.52px;
     height: 429.05px;
-    background-color: aqua;
+    border: 1px rgba(255, 255, 255, 0.390) solid;
+    border-radius: 48.24px;
+    box-shadow: 3px 3px 200px rgba(0, 0, 0, 0.418);
+    background-color: rgba(0, 0, 0, 0.062);
 }
+/* .login-card::before{
+    background-color: rgba(0, 0, 0, 0.315);
+    border-radius: 48.24px;
+    content: "";
+    display: block;
+    width: 456.52px;
+    height: 429.05px;
+    filter: blur(20px);
+} */
 .login-body{
     display: flex;
     position: absolute;
     justify-content: center;
+    align-items: center;
     height: 100vh;
     width: 100vw;
-    background-color: red;
+    /* background-color: rgba(255, 0, 0, 0.151); */
     /* z-index: 0; */
+}
+.login-card h1{
+    color: white;
+    font-family: "Irish Grover", system-ui;
+    text-align: center;
+    font-size: 38.74px;
+    padding-top: 25px;
+}
+.input-fields{
+    display: flex;
+    gap: 30px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /* background-color: red; */
+    height: 325.38px;
+    width: 364.01px;
+    position: relative;
+}
+.input{
+    width: 364.01px;
+    height: 47.5px;
+    background-color: transparent;
+    border-radius: 32.28px;
+    border: white solid 1px;
+    padding-left: 20px; 
+}
+.input:focus{
+    outline: none;
+    caret-color: white;
+}
+.label {
+    position: absolute;
+    left: 5px;
+    margin-top: -50px;
+  color: #ffffff;
+  text-shadow: black 0px 0px 4px;
+
+  /* background-color: rgb(0, 0, 0); */
 }
