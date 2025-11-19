@@ -1,9 +1,9 @@
 import React from "react";
 
-function button() {
+function button(props) {
   return (
     <button className="login-button" type="button">
-      Login
+      {props.title}
     </button>
   );
 }

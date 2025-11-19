@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../App.css";
 import Button from "../componants/button.jsx";
+import "../index.css"
 
 function login() {
   const [formValues, setFormValues] = useState({
@@ -8,6 +9,7 @@ function login() {
     email: "",
     password: "",
   });
+
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -21,10 +23,10 @@ function login() {
   };
 
   return (
-    <div className="login-body">
-      <form className="login-card" onSubmit={handleSubmit}>
-        <h1>LOGIN</h1>
-        <div className="input-fields">
+    <div className="flex absolute justify-center items-center h-screen w-screen -mb-5">
+      <form className="flex flex-col items-center w-[456.52px] h-[429.05px] border border-white/39 rounded-[48.24px] shadow-[3px_3px_200px_rgba(0,0,0,0.418)] bg-black/6" onSubmit={handleSubmit}>
+        <h1 className="text-white font-irish-grover text-center text-[38.74px] pt-[25px]">LOGIN</h1>
+        <div className="flex gap-[30px] flex-col justify-center items-center h-[325.38px] w-[364.01px] relative">
           <input
             type="text"
             className="input"
@@ -53,7 +55,8 @@ function login() {
             onChange={handleChange}
           />
         </div>
-        <Button/>
+        <Button title="Login"/>
+        <h2 className="font-caveat-brush font-thin underline mb-5 text-lg text-white hover:cursor-pointer">sign up</h2>
       </form>
     </div>
   );
