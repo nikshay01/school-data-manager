@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import "../App.css";
 import Button from "../componants/button.jsx";
-import "../index.css"
+import "../index.css";
 
-function Login() {
+function Login({ onSwitchToSignup }) {
   const [formValues, setFormValues] = useState({
     userId: "",
     email: "",
     password: "",
   });
-
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -55,7 +54,16 @@ function Login() {
           />
         </div>
         <Button title="Login"/>
-        <h2 className="font-caveat-brush font-thin underline mb-5 text-lg text-white hover:cursor-pointer">sign up</h2>
+        {onSwitchToSignup && (
+          <button
+            type="button"
+            className="font-caveat-brush font-thin underline mb-5 text-lg text-white hover:cursor-pointer"
+            onClick={onSwitchToSignup}
+            style={{ background: 'none', border: 'none', padding: 0 }}
+          >
+            Sign up
+          </button>
+        )}
       </form>
     </div>
   );
