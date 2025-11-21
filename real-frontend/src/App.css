@@ -1,5 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Irish+Grover&display=swap");
-@import url('https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Dancing+Script:wght@400..700&family=Fredericka+the+Great&family=Great+Vibes&family=Julius+Sans+One&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Pacifico&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Dancing+Script:wght@400..700&family=Fredericka+the+Great&family=Great+Vibes&family=Julius+Sans+One&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Pacifico&display=swap");
 .input {
   width: 364.01px;
   height: 47.5px;
@@ -20,9 +20,9 @@
 }
 
 .input::placeholder {
-    color: #ffffff;
-    opacity: 1;
-  }
+  color: #ffffff;
+  opacity: 1;
+}
 .login-button {
   margin-bottom: 20px;
   width: 119.45px;
@@ -35,23 +35,24 @@
   font-weight: 600;
   letter-spacing: 0.1em;
   cursor: pointer;
-  box-shadow: -2px -2px 6px rgba(255, 255, 255, 0.31);
-  transition: background 0.25s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  box-shadow: -2px -2px 6px rgba(255, 255, 255, 0.31),
+    2px 2px 6px rgba(0, 0, 0, 0.305);
+  transition: background 0.2s ease, box-shadow 0.3s ease, transform 0.3s ease;
   font-family: "Caveat Brush", cursive;
   font-size: 20px;
   font-weight: 100;
 }
 
 .login-button:hover {
-  box-shadow:
-    0 0 12px rgba(255, 255, 255, 0.25);
+  box-shadow: 2px 2px 6px rgba(255, 255, 255, 0.31),
+    -2px -2px 6px rgba(0, 0, 0, 0.305);
+
   transform: translateY(-2px);
 }
 
 .login-button:active {
   transform: translateY(0);
   background: rgba(255, 255, 255, 0.18);
-  box-shadow:
-    0 0 8px rgba(255, 255, 255, 0.25),
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.25),
     0 0 16px rgba(255, 255, 255, 0.2);
 }

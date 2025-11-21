@@ -3,7 +3,7 @@ import "../App.css";
 import Button from "../componants/button.jsx";
 import "../index.css"
 
-function login() {
+function Login() {
   const [formValues, setFormValues] = useState({
     userId: "",
     email: "",
@@ -18,7 +18,6 @@ function login() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // eslint-disable-next-line no-console
     console.log("Form submitted:", formValues);
   };
 
@@ -27,14 +26,14 @@ function login() {
       <form className="flex flex-col items-center w-[456.52px] h-[429.05px] border border-white/39 rounded-[48.24px] shadow-[3px_3px_200px_rgba(0,0,0,0.418)] bg-black/6" onSubmit={handleSubmit}>
         <h1 className="text-white font-irish-grover text-center text-[38.74px] pt-[25px]">LOGIN</h1>
         <div className="flex gap-[30px] flex-col justify-center items-center h-[325.38px] w-[364.01px] relative">
-          <input
+          <input 
             type="text"
             className="input"
             id="userId"
             name="userId"
             placeholder="User ID"
             value={formValues.userId}
-            onChange={handleChange}
+            onChange={handleChange} 
           />
           <input
             type="email"
@@ -62,4 +61,4 @@ function login() {
   );
 }
 
-export default login;
+export default Login;
