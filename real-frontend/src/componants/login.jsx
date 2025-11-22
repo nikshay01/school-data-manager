@@ -9,15 +9,37 @@ function Login({ onSwitchToSignup }) {
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormValues((prevValues) => ({ ...prevValues, [name]: value }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log("Form submitted:", formValues);
+    setLoading(true);
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formValues.email,
+          password: formValues.password,
+        })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        alert(data.error || "Login failed");
+      } else {
+        alert("Login successful!");
+        // TODO: Save auth info & redirect/dashboard
+      }
+    } catch {
+      alert("Network error during login.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -25,7 +47,7 @@ function Login({ onSwitchToSignup }) {
       <form className="flex flex-col items-center w-[456.52px] h-[429.05px] border border-white/39 rounded-[48.24px] shadow-[3px_3px_200px_rgba(0,0,0,0.418)] bg-black/6" onSubmit={handleSubmit}>
         <h1 className="text-white font-irish-grover text-center text-[38.74px] pt-[25px]">LOGIN</h1>
         <div className="flex gap-[30px] flex-col justify-center items-center h-[325.38px] w-[364.01px] relative">
-          <input 
+          <input
             type="text"
             className="input"
             id="userId"
@@ -42,6 +64,7 @@ function Login({ onSwitchToSignup }) {
             placeholder="Email ID"
             value={formValues.email}
             onChange={handleChange}
+            required
           />
           <input
             type="password"
@@ -51,15 +74,17 @@ function Login({ onSwitchToSignup }) {
             placeholder="Password"
             value={formValues.password}
             onChange={handleChange}
+            required
           />
         </div>
-        <Button title="Login"/>
+        <Button title={loading ? "Logging in..." : "Login"} />
         {onSwitchToSignup && (
           <button
             type="button"
             className="font-caveat-brush font-thin underline mb-5 text-lg text-white hover:cursor-pointer"
             onClick={onSwitchToSignup}
             style={{ background: 'none', border: 'none', padding: 0 }}
+            disabled={loading}
           >
             Sign up
           </button>

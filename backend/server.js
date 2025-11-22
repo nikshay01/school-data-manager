@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import Student from "./models/Student.js";
+import User from "./models/User.js";
+import bcrypt from "bcrypt";
 
 dotenv.config();
 const app = express();
@@ -19,6 +21,76 @@ app.get("/", (req, res) => {
   res.send("School Data Manager API is running...");
 });
 
+// 🟢 User signup route
+app.post("/api/auth/signup", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    // Input validation
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required." });
+    }
+    // (Optional) Check for basic email format and password length/strength
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: "Invalid email format." });
+    }
+    if (password.length < 6) {
+      return res.status(400).json({ error: "Password must be at least 6 characters long." });
+    }
+    // Duplicate check
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return res.status(409).json({ error: "User already exists." });
+    // Hashing & save
+    let hashedPassword;
+    try {
+      hashedPassword = await bcrypt.hash(password, 10);
+    } catch (e) {
+      console.error("❌ Bcrypt hash error:", e);
+      return res.status(500).json({ error: "Encryption error, please try again." });
+    }
+    const user = new User({ email, password: hashedPassword });
+    try {
+      await user.save();
+    } catch (err) {
+      if (err.name === "ValidationError") {
+        return res.status(400).json({ error: "Invalid user data." });
+      }
+      if (err.code === 11000) {
+        return res.status(409).json({ error: "Email already registered." });
+      }
+      console.error("❌ DB save error:", err);
+      return res.status(500).json({ error: "Unable to save user." });
+    }
+    res.status(201).json({ message: "User registered successfully" });
+  } catch (err) {
+    console.error("❌ Signup error:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// 🟢 User login route
+app.post("/api/auth/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    // Input validation
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required." });
+    }
+    const user = await User.findOne({ email });
+    if (!user) return res.status(401).json({ error: "Invalid credentials." });
+    let isMatch = false;
+    try {
+      isMatch = await bcrypt.compare(password, user.password);
+    } catch (e) {
+      console.error("❌ Bcrypt compare error:", e);
+      return res.status(500).json({ error: "Error validating password." });
+    }
+    if (!isMatch) return res.status(401).json({ error: "Invalid credentials." });
+    res.status(200).json({ message: "Login successful" });
+  } catch (err) {
+    console.error("❌ Login error:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 // 🟢 POST — Add new student
 app.post("/api/students", async (req, res) => {
@@ -132,6 +204,7 @@ app.delete("/api/students/dl/:id", async (req, res) => {
   }
  })
 
+ // 
 
  
 // 🟢 Start server
