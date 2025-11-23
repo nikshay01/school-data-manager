@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "../App.css";
 import Button from "../componants/button.jsx";
 import "../index.css";
+import SignupResult from "./signupResult";   // <-- NEW
 
 function Signup({ onSwitchToLogin }) {
   const [formValues, setFormValues] = useState({
@@ -10,7 +11,11 @@ function Signup({ onSwitchToLogin }) {
     password: "",
     confirmPassword: ""
   });
+
   const [loading, setLoading] = useState(false);
+
+  // NEW POPUP STATE
+  const [result, setResult] = useState({ status: null, message: "" });
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -19,11 +24,18 @@ function Signup({ onSwitchToLogin }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     if (formValues.password !== formValues.confirmPassword) {
-      alert("Passwords do not match.");
+      setResult({
+        status: "error",
+        message: "Passwords do not match."
+      });
       return;
     }
+
     setLoading(true);
+    setResult({ status: "loading", message: "" });
+
     try {
       const response = await fetch("http://localhost:5000/api/auth/signup", {
         method: "POST",
@@ -33,34 +45,54 @@ function Signup({ onSwitchToLogin }) {
           password: formValues.password,
         })
       });
+
       const data = await response.json();
+
       if (!response.ok) {
-        alert(data.error || "Signup failed");
+        setResult({ status: "error", message: data.error || "Signup failed" });
       } else {
-        alert("Signup successful! Please log in.");
+        setResult({ status: "success", message: "Signup successful!" });
+
+        // Clear fields after success
         setFormValues({ email: "", otp: "", password: "", confirmPassword: "" });
-        if (onSwitchToLogin) onSwitchToLogin();
       }
     } catch {
-      alert("Network error during signup.");
+      setResult({ status: "error", message: "Network error during signup." });
     } finally {
       setLoading(false);
     }
   };
 
   const handleSendOtp = () => {
-    alert("OTP sent to " + formValues.email);
+    setResult({
+      status: "success",
+      message: "OTP sent to " + formValues.email
+    });
   };
 
   return (
     <div className="flex absolute justify-center items-center h-screen w-screen -mb-5">
+
+      {/* OVERLAY ALWAYS ABOVE SIGNUP FORM */}
+      {result.status && (
+        <SignupResult
+          status={result.status}
+          message={result.message}
+          onClose={() => setResult({ status: null, message: "" })}
+        />
+      )}
+
+      {/* YOUR SIGNUP FORM — UNCHANGED */}
       <form
         className="flex flex-col items-center w-[440px] h-[460px] border border-white/39 rounded-[48.24px] shadow-[3px_3px_200px_rgba(0,0,0,0.418)] bg-black/6"
         onSubmit={handleSubmit}
       >
-        <h1 className="text-white font-irish-grover text-center text-[36px] pt-[26px] mb-2 tracking-wide">SIGN UP</h1>
+        <h1 className="text-white font-irish-grover text-center text-[36px] pt-[26px] mb-2 tracking-wide">
+          SIGN UP
+        </h1>
+
         <div className="flex gap-[14px] flex-col justify-center items-center w-[364px] mt-5 mb-2">
-          {/* EMAIL + OTP ROW */}
+
           <div className="relative w-full">
             <input
               type="email"
@@ -82,7 +114,7 @@ function Signup({ onSwitchToLogin }) {
               SEND OTP
             </button>
           </div>
-          {/* OTP INPUT FIELD */}
+
           <input
             type="text"
             className="input"
@@ -93,7 +125,7 @@ function Signup({ onSwitchToLogin }) {
             onChange={handleChange}
             autoComplete="one-time-code"
           />
-          {/* PASSWORD */}
+
           <input
             type="password"
             className="input"
@@ -105,7 +137,7 @@ function Signup({ onSwitchToLogin }) {
             autoComplete="new-password"
             required
           />
-          {/* RE-ENTER PASSWORD */}
+
           <input
             type="password"
             className="input"
@@ -118,9 +150,10 @@ function Signup({ onSwitchToLogin }) {
             required
           />
         </div>
-        {/* BUTTONS: Main sign up, then subtle login below */}
+
         <div className="flex flex-col items-center justify-center w-full mt-2 gap-2">
-          <Button title={loading ? "Signing Up..." : "Sign Up"} typeo='submit' />
+          <Button title={loading ? "Signing Up..." : "Sign Up"} type="submit" />
+
           {onSwitchToLogin && (
             <button
               type="button"

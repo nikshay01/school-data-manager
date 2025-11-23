@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "../App.css";
 import Button from "../componants/button.jsx";
 import "../index.css";
+import LoginResult from "./LoginResult";
 
 function Login({ onSwitchToSignup }) {
   const [formValues, setFormValues] = useState({
@@ -9,7 +10,11 @@ function Login({ onSwitchToSignup }) {
     email: "",
     password: "",
   });
+
   const [loading, setLoading] = useState(false);
+
+  // NEW: control the result popup
+  const [result, setResult] = useState({ status: null, message: "" });
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -17,29 +22,34 @@ function Login({ onSwitchToSignup }) {
   };
 
   const handleSubmit = async (event) => {
-    console.log(formValues.email,'   ', formValues.password); // exception handeling
-
     event.preventDefault();
     setLoading(true);
+
+    // show loading popup
+    setResult({ status: "loading", message: "" });
+
     try {
-      console.log(formValues.email,'   ', formValues.password); // exception handeling
       const response = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: formValues.email,
           password: formValues.password,
-        })
+        }),
       });
+
       const data = await response.json();
+
       if (!response.ok) {
-        alert(data.error || "Login failed");
+        setResult({ status: "error", message: data.error });
       } else {
-        alert("Login successful!");
-        // TODO: Save auth info & redirect/dashboard
+        setResult({ status: "success", message: "Login successful!" });
       }
     } catch {
-      alert("Network error during login.");
+      setResult({
+        status: "error",
+        message: "Network error during login.",
+      });
     } finally {
       setLoading(false);
     }
@@ -47,8 +57,25 @@ function Login({ onSwitchToSignup }) {
 
   return (
     <div className="flex absolute justify-center items-center h-screen w-screen -mb-5">
-      <form className="flex flex-col items-center w-[456.52px] h-[429.05px] border border-white/39 rounded-[48.24px] shadow-[3px_3px_200px_rgba(0,0,0,0.418)] bg-black/6" onSubmit={handleSubmit}>
-        <h1 className="text-white font-irish-grover text-center text-[38.74px] pt-[25px]">LOGIN</h1>
+
+      {/* ALWAYS RENDERS ABOVE THE LOGIN PAGE */}
+      {result.status && (
+        <LoginResult
+          status={result.status}
+          message={result.message}
+          onClose={() => setResult({ status: null, message: "" })}
+        />
+      )}
+
+      {/* YOUR ORIGINAL EXACT LOGIN UI — UNTOUCHED */}
+      <form
+        className="flex flex-col items-center w-[456.52px] h-[429.05px] border border-white/39 rounded-[48.24px] shadow-[3px_3px_200px_rgba(0,0,0,0.418)] bg-black/6"
+        onSubmit={handleSubmit}
+      >
+        <h1 className="text-white font-irish-grover text-center text-[38.74px] pt-[25px]">
+          LOGIN
+        </h1>
+
         <div className="flex gap-[30px] flex-col justify-center items-center h-[325.38px] w-[364.01px] relative">
           <input
             type="text"
@@ -57,7 +84,7 @@ function Login({ onSwitchToSignup }) {
             name="userId"
             placeholder="User ID"
             value={formValues.userId}
-            onChange={handleChange} 
+            onChange={handleChange}
           />
           <input
             type="email"
@@ -80,13 +107,15 @@ function Login({ onSwitchToSignup }) {
             required
           />
         </div>
+
         <Button title={loading ? "Logging in..." : "Login"} type="submit" />
+
         {onSwitchToSignup && (
           <button
             type="button"
             className="font-caveat-brush font-thin underline mb-5 text-lg text-white hover:cursor-pointer"
             onClick={onSwitchToSignup}
-            style={{ background: 'none', border: 'none', padding: 0 }}
+            style={{ background: "none", border: "none", padding: 0 }}
             disabled={loading}
           >
             Sign up
