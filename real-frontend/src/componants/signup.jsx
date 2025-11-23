@@ -25,7 +25,7 @@ function Signup({ onSwitchToLogin }) {
     }
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:3000/api/auth/signup", {
+      const response = await fetch("http://localhost:5000/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -120,7 +120,7 @@ function Signup({ onSwitchToLogin }) {
         </div>
         {/* BUTTONS: Main sign up, then subtle login below */}
         <div className="flex flex-col items-center justify-center w-full mt-2 gap-2">
-          <Button title={loading ? "Signing Up..." : "Sign Up"} />
+          <Button title={loading ? "Signing Up..." : "Sign Up"} typeo='submit' />
           {onSwitchToLogin && (
             <button
               type="button"

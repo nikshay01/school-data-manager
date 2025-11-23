@@ -17,9 +17,12 @@ function Login({ onSwitchToSignup }) {
   };
 
   const handleSubmit = async (event) => {
+    console.log(formValues.email,'   ', formValues.password); // exception handeling
+
     event.preventDefault();
     setLoading(true);
     try {
+      console.log(formValues.email,'   ', formValues.password); // exception handeling
       const response = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -77,7 +80,7 @@ function Login({ onSwitchToSignup }) {
             required
           />
         </div>
-        <Button title={loading ? "Logging in..." : "Login"} />
+        <Button title={loading ? "Logging in..." : "Login"} type="submit" />
         {onSwitchToSignup && (
           <button
             type="button"

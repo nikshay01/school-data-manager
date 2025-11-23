@@ -23,6 +23,7 @@ app.get("/", (req, res) => {
 
 // 🟢 User signup route
 app.post("/api/auth/signup", async (req, res) => {
+  console.log('signup req reached'); // exception handeling
   try {
     const { email, password } = req.body;
     // Input validation
