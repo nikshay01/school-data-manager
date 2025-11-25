@@ -44,6 +44,7 @@ function Login({ onSwitchToSignup }) {
         setResult({ status: "error", message: data.error });
       } else {
         setResult({ status: "success", message: "Login successful!" });
+        localStorage.setItem("email", formValues.email);
       }
     } catch {
       setResult({

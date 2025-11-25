@@ -14,3 +14,7 @@ ADD SOMETHING TO SEND NOTIFICATION TO PRINCIPAL WHENEVER AN FEE IS EDITED
 AND GIVE AN TABLE OF FEE ADDED TO THE DB FOR DAILY TO THE PRINCIPAL
 
 MAKE EVERYTHING PRINTABLE.
+
+
+procrastinate----------------------------------
+restructuring where is which filed of input in complete profile tab

@@ -4,7 +4,7 @@ import Login from "./componants/login";
 import Bg from "./componants/bg";
 import Signup from "./componants/signup";
 import TopBar from "./componants/topBar";
-
+import CompleteProfile from "./componants/completeProfile";
 const App = () => {
   const [isSignup, setIsSignup] = useState(false);
 
@@ -16,6 +16,7 @@ const App = () => {
       ) : (
         <Login onSwitchToSignup={() => setIsSignup(true)} />
       )}
+      {/* <CompleteProfile /> */}
       <Bg />
     </div>
   );
