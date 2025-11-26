@@ -15,41 +15,42 @@ export default function CompleteProfile() {
     phone: "",
   });
 
-  const handleChange = async (e) => {
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
+
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+        try {
+      const response = await fetch("http://localhost:5000/api/auth/complete-profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username: form.username,
           schoolId: form.schoolId,
           position: form.role,
-          aadhar:form.aadhar,
+          aadhar: form.aadhar,
           fullName: form.fullName,
-          address : form.address,
+          address: form.address,
           gender: form.gender,
-          phone:form.gender
+          phone: form.phone
         }),
       });
 
       const data = await response.json();
       console.log(data);//error handeling
-      alert('check console my nigga')
-      
+      // alert('check console my nigga')
 
-      if (!response.ok){
+
+      if (!response.ok) {
         console.error("err:");
-        
+
       }
     } catch {
-        console.log('error');
-        
-    }
-  };
+      console.log('error');
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+    }
     alert("Profile submitted!");
   };
 

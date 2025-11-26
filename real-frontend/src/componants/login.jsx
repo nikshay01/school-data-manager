@@ -45,6 +45,7 @@ function Login({ onSwitchToSignup }) {
       } else {
         setResult({ status: "success", message: "Login successful!" });
         localStorage.setItem("email", formValues.email);
+        window.location.reload();
       }
     } catch {
       setResult({

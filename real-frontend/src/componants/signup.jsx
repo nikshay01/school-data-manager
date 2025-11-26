@@ -52,6 +52,8 @@ function Signup({ onSwitchToLogin }) {
         setResult({ status: "error", message: data.error || "Signup failed" });
       } else {
         setResult({ status: "success", message: "Signup successful!" });
+        localStorage.setItem("email", formValues.email);
+        window.location.reload();
 
         // Clear fields after success
         setFormValues({ email: "", otp: "", password: "", confirmPassword: "" });
