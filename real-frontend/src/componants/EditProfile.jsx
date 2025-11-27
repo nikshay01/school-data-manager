@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../index.css";
 import "../App.css";
 import Button from "./button";
 
-export default function CompleteProfile() {
+export default function EditProfile() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     username: "",
     school: "",
@@ -17,22 +19,45 @@ export default function CompleteProfile() {
 
   const [schools, setSchools] = useState([]);
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchSchools = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/schools");
-        if (response.ok) {
-          const data = await response.json();
-          setSchools(data);
-        } else {
-          console.error("Failed to fetch schools");
+        // Fetch Schools
+        const schoolsRes = await fetch("http://localhost:5000/api/schools");
+        if (schoolsRes.ok) {
+          setSchools(await schoolsRes.json());
+        }
+
+        // Fetch User Data
+        const email = localStorage.getItem("email");
+        if (email) {
+          const usersRes = await fetch("http://localhost:5000/api/auth/users");
+          if (usersRes.ok) {
+            const users = await usersRes.json();
+            const currentUser = users.find((u) => u.email === email);
+            if (currentUser) {
+              setForm({
+                username: currentUser.username || "",
+                school: currentUser.school?._id || currentUser.school || "",
+                role: currentUser.position || "",
+                aadhar: currentUser.aadhar || "",
+                fullName: currentUser.name || "",
+                address: currentUser.address || "",
+                gender: currentUser.gender || "",
+                phone: currentUser.contact || "",
+              });
+            }
+          }
         }
       } catch (error) {
-        console.error("Error fetching schools:", error);
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
     };
-    fetchSchools();
+    fetchData();
   }, []);
 
   const handleChange = (e) => {
@@ -55,17 +80,12 @@ export default function CompleteProfile() {
       newErrors.username = "Username must be 3-30 characters";
 
     if (!form.school) newErrors.school = "School is required";
-
     if (!form.role) newErrors.role = "Role is required";
-
     if (form.aadhar && !aadharRegex.test(form.aadhar))
       newErrors.aadhar = "Aadhar must be 12 digits";
-
     if (!form.fullName.trim()) newErrors.fullName = "Full Name is required";
-
     if (form.gender && !["male", "female", "other"].includes(form.gender))
       newErrors.gender = "Invalid gender selection";
-
     if (form.phone && !phoneRegex.test(form.phone))
       newErrors.phone = "Phone must be 10 digits";
 
@@ -75,10 +95,9 @@ export default function CompleteProfile() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const email = localStorage.getItem("email");
-
     if (!validateForm()) return;
 
+    const email = localStorage.getItem("email");
     try {
       const apidata = {
         email: email,
@@ -102,13 +121,11 @@ export default function CompleteProfile() {
       );
 
       const data = await response.json();
-
       if (!response.ok) {
-        console.error("Server Error:", data.error);
         alert(data.error || "Failed to update profile");
       } else {
-        console.log(data);
-        alert("Profile submitted successfully!");
+        alert("Profile updated successfully!");
+        navigate("/profile");
       }
     } catch (err) {
       console.error("Network Error:", err);
@@ -116,20 +133,20 @@ export default function CompleteProfile() {
     }
   };
 
+  if (loading)
+    return <div className="text-white text-center mt-20">Loading...</div>;
+
   return (
     <div className="flex absolute justify-center items-center h-screen w-screen -mb-5">
       <form
         className="flex scale-[0.75] flex-col items-center w-[900px] h-fit py-6 border border-white/30 rounded-[48px] shadow-[3px_3px_200px_rgba(0,0,0,0.35)] bg-black/10"
         onSubmit={handleSubmit}
       >
-        {/* HEADING */}
         <h1 className="text-white font-irish-grover text-center text-[36px] tracking-wide mb-3">
-          COMPLETE PROFILE
+          EDIT PROFILE
         </h1>
 
-        {/* 2 COLUMN GRID */}
         <div className="grid grid-cols-2 gap-x-6 gap-y-4 w-[750px] mt-2 mb-6">
-          {/* LEFT COLUMN */}
           <div className="flex flex-col">
             <input
               className={`input ${errors.username ? "border-red-500" : ""}`}
@@ -215,7 +232,6 @@ export default function CompleteProfile() {
             )}
           </div>
 
-          {/* RIGHT COLUMN */}
           <div className="flex flex-col">
             <input
               className={`input ${errors.fullName ? "border-red-500" : ""}`}
@@ -282,8 +298,16 @@ export default function CompleteProfile() {
           </div>
         </div>
 
-        {/* SUBMIT BUTTON */}
-        <Button title="SEND ACCESS REQUEST" type="submit" />
+        <div className="flex gap-4">
+          <Button title="UPDATE PROFILE" type="submit" />
+          <button
+            type="button"
+            onClick={() => navigate("/profile")}
+            className="px-6 py-2 bg-red-500/20 border border-red-500/50 rounded-xl text-white font-bold hover:bg-red-500/30 transition-all"
+          >
+            CANCEL
+          </button>
+        </div>
       </form>
     </div>
   );

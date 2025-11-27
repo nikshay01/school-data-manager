@@ -1,10 +1,11 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import "../App.css";
 import Button from "../componants/button.jsx";
 import "../index.css";
 import LoginResult from "./LoginResult";
 
-function Login({ onSwitchToSignup }) {
+function Login() {
   const [formValues, setFormValues] = useState({
     userId: "",
     email: "",
@@ -59,7 +60,6 @@ function Login({ onSwitchToSignup }) {
 
   return (
     <div className="flex absolute justify-center items-center h-screen w-screen -mb-5">
-
       {/* ALWAYS RENDERS ABOVE THE LOGIN PAGE */}
       {result.status && (
         <LoginResult
@@ -112,17 +112,13 @@ function Login({ onSwitchToSignup }) {
 
         <Button title={loading ? "Logging in..." : "Login"} type="submit" />
 
-        {onSwitchToSignup && (
-          <button
-            type="button"
-            className="font-caveat-brush font-thin underline mb-5 text-lg text-white hover:cursor-pointer"
-            onClick={onSwitchToSignup}
-            style={{ background: "none", border: "none", padding: 0 }}
-            disabled={loading}
-          >
-            Sign up
-          </button>
-        )}
+        <Link
+          to="/signup"
+          className="font-caveat-brush font-thin underline mb-5 text-lg text-white hover:cursor-pointer"
+          style={{ background: "none", border: "none", padding: 0 }}
+        >
+          Sign up
+        </Link>
       </form>
     </div>
   );

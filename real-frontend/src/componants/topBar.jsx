@@ -1,17 +1,19 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import "../App.css";
 import Logout from "./Logout";
 
 function TopBar() {
   return (
-
     <div className="absolute border-2 w-[100vw] h-[124px] bg-black bg-opacity-35">
       {/* Logout Button */}
       <div className="absolute right-10 top-10">
         <Logout />
       </div>
-      <div className="h-[82px] w-[213px] mt-[20px] ml-[38px] border border-white/50 rounded-[30px] bg-gradient-to-t from-white/20 to-black/0 bg-clip-padding">
-
+      <Link
+        to="/profile"
+        className="block h-[82px] w-[213px] mt-[20px] ml-[38px] border border-white/50 rounded-[30px] bg-gradient-to-t from-white/20 to-black/0 bg-clip-padding hover:bg-white/10 transition-all cursor-pointer"
+      >
         {/* Avatar Icon */}
         <div className="h-[59px] w-[59px] ml-[13px] mt-[12px]">
           <svg
@@ -47,9 +49,7 @@ function TopBar() {
           <p className="uppercase jul">hemant sharma</p>
           <p className="uppercase jul">com. op</p>
         </div>
-      </div>
-
-
+      </Link>
     </div>
   );
 }

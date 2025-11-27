@@ -15,7 +15,8 @@ export const signupUser = async (req, res) => {
         .json({ error: "Email and password are required." });
 
     // Validate email format with regex
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email))
       return res.status(400).json({ error: "Invalid email format." });
 
     // Validate password length
@@ -53,14 +54,33 @@ export const loginUser = async (req, res) => {
     const { email, password } = req.body; // Extract login credentials
 
     // Find the user by email
-    const user = await User.findOne({ email });
-    if (!user)
-      return res.status(401).json({ error: "Invalid credentials." });
+    // We need to explicitly select password because it's set to select: false in schema
+    const user = await User.findOne({ email }).select("+password");
+
+    if (!user) return res.status(401).json({ error: "Invalid credentials." });
+
+    // Check account status
+    if (user.accountStatus !== "active") {
+      return res.status(403).json({ error: "Account is not active." });
+    }
+
+    if (user.isDeleted) {
+      return res.status(403).json({ error: "Account has been deleted." });
+    }
 
     // Compare provided password with stored hashed password
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
+    if (!isMatch) {
+      // Increment failed login attempts (optional feature implementation)
+      user.failedLoginAttempts = (user.failedLoginAttempts || 0) + 1;
+      await user.save();
       return res.status(401).json({ error: "Invalid credentials." });
+    }
+
+    // Reset failed login attempts on successful login
+    user.failedLoginAttempts = 0;
+    user.lastLogin = new Date();
+    await user.save();
 
     // Successful login (token creation can be added later)
     res.json({ message: "Login successful" });
@@ -76,16 +96,19 @@ export const loginUser = async (req, res) => {
 export const completeProfile = async (req, res) => {
   try {
     // Extract profile fields from request body
+    console.log("request reached at completeprofile controller");
+
     const {
-      email,         // Email used to find the user to update
+      email, // Email used to find the user to update
       username,
-      schoolId,
+      school, // Changed from schoolId to school (ObjectId)
       position,
       aadhar,
-      fullName,
+      fullName, // Maps to 'name' in schema
       address,
       gender,
-      phone,
+      phone, // Maps to 'contact' in schema
+      access, // New field
     } = req.body;
 
     // 1️⃣ Find the user using email
@@ -94,29 +117,51 @@ export const completeProfile = async (req, res) => {
       return res.status(404).json({ error: "User not found." });
     }
 
-    // 2️⃣ Check if username is already taken by someone else
+    // 2️⃣ Validate Username
+    const usernameRegex = /^[a-zA-Z0-9_]+$/;
+    if (!usernameRegex.test(username)) {
+      return res.status(400).json({
+        error: "Username can only contain letters, numbers, and underscores.",
+      });
+    }
     const nameTaken = await User.findOne({ username, _id: { $ne: user._id } });
     if (nameTaken) {
       return res.status(409).json({ error: "UserName already exists." });
     }
 
-    // 3️⃣ Check if Aadhar number already exists (except current user)
+    // 3️⃣ Validate Aadhar (12 digits)
+    if (aadhar && !/^\d{12}$/.test(aadhar)) {
+      return res
+        .status(400)
+        .json({ error: "Aadhar number must be exactly 12 digits." });
+    }
     const adTaken = await User.findOne({ aadhar, _id: { $ne: user._id } });
     if (adTaken) {
-      return res.status(409).json({ error: "User Aadhar number already exists." });
+      return res
+        .status(409)
+        .json({ error: "User Aadhar number already exists." });
     }
 
-    // 4️⃣ Update all profile fields
+    // 4️⃣ Validate Contact (10 digits)
+    if (phone && !/^\d{10}$/.test(phone)) {
+      return res
+        .status(400)
+        .json({ error: "Contact number must be exactly 10 digits." });
+    }
+
+    // 5️⃣ Update all profile fields
     user.username = username;
-    user.schoolId = schoolId;
+    user.school = school; // Expecting ObjectId
     user.position = position;
     user.aadhar = aadhar;
     user.name = fullName;
     user.address = address;
     user.gender = gender;
     user.contact = phone;
+    user.access = access || "employee"; // Default to employee if not provided
+    user.profileCompleted = true;
 
-    // 5️⃣ Save updated document
+    // 6️⃣ Save updated document
     await user.save();
 
     // Send success response
@@ -126,6 +171,71 @@ export const completeProfile = async (req, res) => {
     });
   } catch (error) {
     console.log(error); // log internal error
+    // Handle Mongoose validation errors
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((val) => val.message);
+      return res.status(400).json({ error: messages.join(", ") });
+    }
     return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// --------------------------------------
+// ADMIN: GET ALL USERS
+// --------------------------------------
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().populate("school", "name code");
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// --------------------------------------
+// ADMIN: UPDATE USER
+// --------------------------------------
+export const updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedUser = await User.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!updatedUser) return res.status(404).json({ error: "User not found" });
+    res.json(updatedUser);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// --------------------------------------
+// GET CURRENT USER
+// --------------------------------------
+export const getCurrentUser = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: "Email is required" });
+
+    const user = await User.findOne({ email }).populate("school", "name code");
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// --------------------------------------
+// ADMIN: DELETE USER
+// --------------------------------------
+export const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedUser = await User.findByIdAndDelete(id);
+    if (!deletedUser) return res.status(404).json({ error: "User not found" });
+    res.json({ message: "User deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };

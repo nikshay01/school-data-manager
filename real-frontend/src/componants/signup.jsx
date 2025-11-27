@@ -1,15 +1,16 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import "../App.css";
 import Button from "../componants/button.jsx";
 import "../index.css";
-import SignupResult from "./signupResult";   // <-- NEW
+import SignupResult from "./signupResult";
 
-function Signup({ onSwitchToLogin }) {
+function Signup() {
   const [formValues, setFormValues] = useState({
     email: "",
     otp: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -28,7 +29,7 @@ function Signup({ onSwitchToLogin }) {
     if (formValues.password !== formValues.confirmPassword) {
       setResult({
         status: "error",
-        message: "Passwords do not match."
+        message: "Passwords do not match.",
       });
       return;
     }
@@ -43,7 +44,7 @@ function Signup({ onSwitchToLogin }) {
         body: JSON.stringify({
           email: formValues.email,
           password: formValues.password,
-        })
+        }),
       });
 
       const data = await response.json();
@@ -56,7 +57,12 @@ function Signup({ onSwitchToLogin }) {
         window.location.reload();
 
         // Clear fields after success
-        setFormValues({ email: "", otp: "", password: "", confirmPassword: "" });
+        setFormValues({
+          email: "",
+          otp: "",
+          password: "",
+          confirmPassword: "",
+        });
       }
     } catch {
       setResult({ status: "error", message: "Network error during signup." });
@@ -68,13 +74,12 @@ function Signup({ onSwitchToLogin }) {
   const handleSendOtp = () => {
     setResult({
       status: "success",
-      message: "OTP sent to " + formValues.email
+      message: "OTP sent to " + formValues.email,
     });
   };
 
   return (
     <div className="flex absolute justify-center items-center h-screen w-screen -mb-5">
-
       {/* OVERLAY ALWAYS ABOVE SIGNUP FORM */}
       {result.status && (
         <SignupResult
@@ -94,7 +99,6 @@ function Signup({ onSwitchToLogin }) {
         </h1>
 
         <div className="flex gap-[14px] flex-col justify-center items-center w-[364px] mt-5 mb-2">
-
           <div className="relative w-full">
             <input
               type="email"
@@ -110,7 +114,7 @@ function Signup({ onSwitchToLogin }) {
             <button
               type="button"
               className="absolute right-[14px] top-1/2 -translate-y-1/2 text-white font-mono text-[15px] underline hover:opacity-80 px-2"
-              style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}
+              style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
               onClick={handleSendOtp}
             >
               SEND OTP
@@ -156,17 +160,13 @@ function Signup({ onSwitchToLogin }) {
         <div className="flex flex-col items-center justify-center w-full mt-2 gap-2">
           <Button title={loading ? "Signing Up..." : "Sign Up"} type="submit" />
 
-          {onSwitchToLogin && (
-            <button
-              type="button"
-              className="text-white text-[16px] font-caveat-brush underline hover:cursor-pointer mt-[-15px]"
-              style={{ letterSpacing: "0.07em", fontWeight: 100 }}
-              onClick={onSwitchToLogin}
-              disabled={loading}
-            >
-              LOGIN
-            </button>
-          )}
+          <Link
+            to="/login"
+            className="text-white text-[16px] font-caveat-brush underline hover:cursor-pointer mt-[-15px]"
+            style={{ letterSpacing: "0.07em", fontWeight: 100 }}
+          >
+            LOGIN
+          </Link>
         </div>
       </form>
     </div>
