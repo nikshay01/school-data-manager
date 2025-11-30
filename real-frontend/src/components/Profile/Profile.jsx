@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import "../index.css";
-import "../App.css";
+import "../../index.css";
+import "../../App.css";
 
 export default function Profile() {
   const [user, setUser] = useState(null);

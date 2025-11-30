@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "../App.css";
-import Logout from "./Logout";
+import "../../App.css";
+import Logout from "../Auth/Logout";
 
 function TopBar() {
   return (

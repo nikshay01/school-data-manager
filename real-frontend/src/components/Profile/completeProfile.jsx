@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import "../index.css";
-import "../App.css";
-import Button from "./button";
+import "../../index.css";
+import "../../App.css";
+import Button from "../Common/button";
 
 export default function CompleteProfile() {
   const [form, setForm] = useState({
@@ -147,9 +147,8 @@ export default function CompleteProfile() {
 
           <div className="flex flex-col">
             <select
-              className={`input text-white ${
-                errors.school ? "border-red-500" : ""
-              }`}
+              className={`input text-white ${errors.school ? "border-red-500" : ""
+                }`}
               name="school"
               value={form.school}
               onChange={handleChange}
@@ -174,9 +173,8 @@ export default function CompleteProfile() {
 
           <div className="flex flex-col">
             <select
-              className={`input text-white ${
-                errors.role ? "border-red-500" : ""
-              }`}
+              className={`input text-white ${errors.role ? "border-red-500" : ""
+                }`}
               name="role"
               value={form.role}
               onChange={handleChange}
@@ -243,9 +241,8 @@ export default function CompleteProfile() {
 
           <div className="flex flex-col">
             <select
-              className={`input text-white ${
-                errors.gender ? "border-red-500" : ""
-              }`}
+              className={`input text-white ${errors.gender ? "border-red-500" : ""
+                }`}
               name="gender"
               value={form.gender}
               onChange={handleChange}

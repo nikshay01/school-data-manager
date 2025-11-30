@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import "./index.css";
-import Login from "./componants/login";
-import Bg from "./componants/bg";
-import Signup from "./componants/signup";
-import TopBar from "./componants/topBar";
-import CompleteProfile from "./componants/completeProfile";
-import AdminDashboard from "./componants/AdminDashboard";
-import ManageUsers from "./componants/ManageUsers";
-import ManageSchools from "./componants/ManageSchools";
-import Profile from "./componants/Profile";
-import EditProfile from "./componants/EditProfile";
-import UserDashboard from "./componants/UserDashboard";
+import Login from "./components/Auth/login";
+import Bg from "./components/Common/bg";
+import Signup from "./components/Auth/signup";
+import TopBar from "./components/Common/topBar";
+import CompleteProfile from "./components/Profile/completeProfile";
+import AdminDashboard from "./components/Dashboard/AdminDashboard";
+import ManageUsers from "./components/Management/ManageUsers";
+import ManageSchools from "./components/Management/ManageSchools";
+import Profile from "./components/Profile/Profile";
+import EditProfile from "./components/Profile/EditProfile";
+import UserDashboard from "./components/Dashboard/UserDashboard";
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);

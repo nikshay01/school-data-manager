@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "../App.css";
-import Button from "../componants/button.jsx";
-import "../index.css";
-import LoginResult from "./LoginResult";
+import "../../App.css";
+import Button from "../Common/button.jsx";
+import "../../index.css";
+import LoginResult from "./loginResult";
 
 function Login() {
   const [formValues, setFormValues] = useState({

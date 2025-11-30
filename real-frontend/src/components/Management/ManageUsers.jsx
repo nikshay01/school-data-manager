@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import "../index.css";
-import "../App.css";
+import "../../index.css";
+import "../../App.css";
 
 export default function ManageUsers() {
   const [users, setUsers] = useState([]);

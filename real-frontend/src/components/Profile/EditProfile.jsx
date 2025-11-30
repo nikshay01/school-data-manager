@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../index.css";
-import "../App.css";
-import Button from "./button";
+import "../../index.css";
+import "../../App.css";
+import Button from "../Common/button";
 
 export default function EditProfile() {
   const navigate = useNavigate();
@@ -20,6 +20,7 @@ export default function EditProfile() {
   const [schools, setSchools] = useState([]);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,22 +34,25 @@ export default function EditProfile() {
         // Fetch User Data
         const email = localStorage.getItem("email");
         if (email) {
-          const usersRes = await fetch("http://localhost:5000/api/auth/users");
-          if (usersRes.ok) {
-            const users = await usersRes.json();
-            const currentUser = users.find((u) => u.email === email);
-            if (currentUser) {
-              setForm({
-                username: currentUser.username || "",
-                school: currentUser.school?._id || currentUser.school || "",
-                role: currentUser.position || "",
-                aadhar: currentUser.aadhar || "",
-                fullName: currentUser.name || "",
-                address: currentUser.address || "",
-                gender: currentUser.gender || "",
-                phone: currentUser.contact || "",
-              });
-            }
+          const response = await fetch("http://localhost:5000/api/auth/me", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email }),
+          });
+
+          if (response.ok) {
+            const currentUser = await response.json();
+            setIsAdmin(currentUser.position === "admin");
+            setForm({
+              username: currentUser.username || "",
+              school: currentUser.school?._id || currentUser.school || "",
+              role: currentUser.position || "",
+              aadhar: currentUser.aadhar || "",
+              fullName: currentUser.name || "",
+              address: currentUser.address || "",
+              gender: currentUser.gender || "",
+              phone: currentUser.contact || "",
+            });
           }
         }
       } catch (error) {
@@ -164,9 +168,8 @@ export default function EditProfile() {
 
           <div className="flex flex-col">
             <select
-              className={`input text-white ${
-                errors.school ? "border-red-500" : ""
-              }`}
+              className={`input text-white ${errors.school ? "border-red-500" : ""
+                }`}
               name="school"
               value={form.school}
               onChange={handleChange}
@@ -191,12 +194,12 @@ export default function EditProfile() {
 
           <div className="flex flex-col">
             <select
-              className={`input text-white ${
-                errors.role ? "border-red-500" : ""
-              }`}
+              className={`input text-white ${errors.role ? "border-red-500" : ""
+                } ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
               name="role"
               value={form.role}
               onChange={handleChange}
+              disabled={!isAdmin}
             >
               <option value="" disabled className="text-black">
                 ROLE
@@ -259,9 +262,8 @@ export default function EditProfile() {
 
           <div className="flex flex-col">
             <select
-              className={`input text-white ${
-                errors.gender ? "border-red-500" : ""
-              }`}
+              className={`input text-white ${errors.gender ? "border-red-500" : ""
+                }`}
               name="gender"
               value={form.gender}
               onChange={handleChange}

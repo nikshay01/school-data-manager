@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "../App.css";
-import Button from "../componants/button.jsx";
-import "../index.css";
+import "../../App.css";
+import Button from "../Common/button.jsx";
+import "../../index.css";
 import SignupResult from "./signupResult";
 
 function Signup() {
