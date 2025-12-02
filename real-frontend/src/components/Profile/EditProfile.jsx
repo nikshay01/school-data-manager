@@ -141,9 +141,9 @@ export default function EditProfile() {
     return <div className="text-white text-center mt-20">Loading...</div>;
 
   return (
-    <div className="flex absolute justify-center items-center h-screen w-screen -mb-5">
+    <div className="flex justify-center items-center w-full h-full py-10">
       <form
-        className="flex scale-[0.75] flex-col items-center w-[900px] h-fit py-6 border border-white/30 rounded-[48px] shadow-[3px_3px_200px_rgba(0,0,0,0.35)] bg-black/10"
+        className="flex scale-[0.75] flex-col items-center w-[900px] h-fit py-6 border border-white/30 rounded-[48px] shadow-[3px_3px_200px_rgba(0,0,0,0.35)] bg-black/10 backdrop-blur-md"
         onSubmit={handleSubmit}
       >
         <h1 className="text-white font-irish-grover text-center text-[36px] tracking-wide mb-3">
@@ -168,8 +168,9 @@ export default function EditProfile() {
 
           <div className="flex flex-col">
             <select
-              className={`input text-white ${errors.school ? "border-red-500" : ""
-                }`}
+              className={`input text-white ${
+                errors.school ? "border-red-500" : ""
+              }`}
               name="school"
               value={form.school}
               onChange={handleChange}
@@ -194,8 +195,9 @@ export default function EditProfile() {
 
           <div className="flex flex-col">
             <select
-              className={`input text-white ${errors.role ? "border-red-500" : ""
-                } ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`input text-white ${
+                errors.role ? "border-red-500" : ""
+              } ${!isAdmin ? "opacity-50 cursor-not-allowed" : ""}`}
               name="role"
               value={form.role}
               onChange={handleChange}
@@ -262,8 +264,9 @@ export default function EditProfile() {
 
           <div className="flex flex-col">
             <select
-              className={`input text-white ${errors.gender ? "border-red-500" : ""
-                }`}
+              className={`input text-white ${
+                errors.gender ? "border-red-500" : ""
+              }`}
               name="gender"
               value={form.gender}
               onChange={handleChange}

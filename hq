@@ -1,0 +1,40 @@
+[33mb9d4060[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m sorted the components folder in react and no one but admin can switch the access now
+[33m0b3281f[m revert to the last changes i things are not right but i have done manyyyyyyy things here which i forgot to commit
+[33m41865ae[m yet to test complete profile and test the new api for that
+[33m1e8861d[m working on user schema and complete profile
+[33mc70b9f4[m added navbar
+[33m2ee5f3e[m added popup componant for login and signup status
+[33me9870c2[m update all the routes and split the backend for more simplification
+[33m72a78ce[m sigup and login page are now successfully working with the auth api's
+[33mec7d5ac[m filler
+[33m1042900[m college 22-11-25
+[33m71c599a[m arrived at college 21-22-25
+[33m0d03d36[m Signup button is complete and just needs some finishing touches
+[33m3dd8c44[m login page done + tailwind installed
+[33m38f0c3c[m webstorm setup
+[33m0381045[m webstorm setup
+[33m79bc6ca[m removed nested folders
+[33m2643b0f[m vite tweaks
+[33m506a397[m frontend
+[33mc30d56e[m vite
+[33mf9710dc[m login card in work
+[33m326a5d3[m started building react frontend and created blob bg
+[33m5b47181[m fixed update student route for getting a single student which was mixed with getting students by classes
+[33m00399eb[m updated features section
+[33m7a913c2[m updated the shema, added left school date and state/rajya fields
+[33mada6f31[m new updates
+[33m6b7d5d2[m final commit before designing frontend
+[33mce71cfc[m class only students load
+[33m0a6f3ba[m i forgot what i did here. maybe created delete button
+[33m723b7d8[m fixed student search backend
+[33m4540095[m update section complete
+[33mbb2fb17[m atlas
+[33m2f7ef9e[m day 3:made update section for backend(incomplete)
+[33m621ee65[m day 2:made update section for backend(incomplete)
+[33mfda29d7[m day 2:made update section for backend(incomplete)
+[33m4cc0e4f[m day 1 end
+[33m8cde14c[m day 1 end
+[33m95c1412[m day 1
+[33m91b77ea[m project setup 2
+[33ma27b413[m project setup
+[33m4d75a9e[m first commit

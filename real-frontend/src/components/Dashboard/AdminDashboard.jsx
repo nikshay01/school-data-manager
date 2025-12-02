@@ -5,7 +5,7 @@ import "../../App.css";
 
 export default function AdminDashboard() {
   return (
-    <div className="flex flex-col items-center min-h-screen w-full pt-24 pb-10">
+    <div className="flex flex-col items-center w-full pb-10">
       <h1 className="text-white font-irish-grover text-[48px] tracking-wide mb-8">
         ADMIN DASHBOARD
       </h1>
@@ -28,7 +28,7 @@ export default function AdminDashboard() {
         </Link>
       </div>
 
-      <div className="w-[90%] max-w-[1200px] bg-black/20 border border-white/10 rounded-[32px] p-8 backdrop-blur-sm">
+      <div className="w-[90%] max-w-[1200px] bg-black/20 border border-white/10 rounded-[32px] p-8 backdrop-blur-md">
         <Outlet />
       </div>
     </div>

@@ -49,12 +49,12 @@ export default function Profile() {
     return <div className="text-white text-center mt-20">User not found.</div>;
 
   return (
-    <div className="flex flex-col items-center min-h-screen w-full pt-24 pb-10">
+    <div className="flex flex-col items-center w-full pb-10">
       <h1 className="text-white font-irish-grover text-[48px] tracking-wide mb-8">
         MY PROFILE
       </h1>
 
-      <div className="w-[90%] max-w-[800px] bg-black/20 border border-white/10 rounded-[32px] p-8 backdrop-blur-sm relative">
+      <div className="w-[90%] max-w-[800px] bg-black/20 border border-white/10 rounded-[32px] p-8 backdrop-blur-md relative">
         <Link to="/profile/edit" className="absolute top-8 right-8">
           <button className="px-6 py-2 bg-white/10 border border-white/30 rounded-xl text-white font-bold hover:bg-white/20 transition-all">
             EDIT
