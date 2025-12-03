@@ -91,7 +91,7 @@ function Signup() {
 
       {/* YOUR SIGNUP FORM — UNCHANGED */}
       <form
-        className="flex flex-col items-center w-[440px] h-[460px] border border-white/39 rounded-[48.24px] shadow-[3px_3px_200px_rgba(0,0,0,0.418)] bg-black/6"
+        className="flex flex-col items-center w-[440px] h-[460px] border border-white/39 rounded-[48.24px] shadow-[3px_3px_200px_rgba(0,0,0,0.418)] bg-black/6 backdrop-blur-md"
         onSubmit={handleSubmit}
       >
         <h1 className="text-white font-irish-grover text-center text-[36px] pt-[26px] mb-2 tracking-wide">

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import "./index.css";
 import Login from "./components/Auth/login";
-import GridMotion from "./components/Common/GridMotion";
 import Signup from "./components/Auth/signup";
 import TopBar from "./components/Common/topBar";
 import CompleteProfile from "./components/Profile/completeProfile";
@@ -12,7 +11,11 @@ import ManageSchools from "./components/Management/ManageSchools";
 import Profile from "./components/Profile/Profile";
 import EditProfile from "./components/Profile/EditProfile";
 import UserDashboard from "./components/Dashboard/UserDashboard";
+import Students from "./components/Dashboard/Students";
+import Fees from "./components/Dashboard/Fees";
+import Reports from "./components/Dashboard/Reports";
 import MainLayout from "./components/Common/MainLayout";
+import Bg from "./components/Common/bg.jsx";
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -72,26 +75,9 @@ const App = () => {
             <Route path="/profile/edit" element={<EditProfile />} />
 
             {/* Placeholder routes for Sidebar links */}
-            <Route
-              path="/students"
-              element={
-                <div className="text-white p-8">
-                  Students Page (Coming Soon)
-                </div>
-              }
-            />
-            <Route
-              path="/fees"
-              element={
-                <div className="text-white p-8">Fees Page (Coming Soon)</div>
-              }
-            />
-            <Route
-              path="/reports"
-              element={
-                <div className="text-white p-8">Reports Page (Coming Soon)</div>
-              }
-            />
+            <Route path="/students" element={<Students />} />
+            <Route path="/fees" element={<Fees />} />
+            <Route path="/reports" element={<Reports />} />
 
             {/* Admin Routes */}
             <Route
@@ -123,34 +109,8 @@ const App = () => {
             element={<Navigate to={isLoggedIn ? "/dashboard" : "/login"} />}
           />
         </Routes>
-        <GridMotion
-          items={[
-            "Item 1",
-            <div key="jsx-item-1">Custom JSX Content</div>,
-            "https://images.unsplash.com/photo-1723403804231-f4e9b515fe9d?q=80&w=3870&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            "Item 2",
-            <div key="jsx-item-2">Custom JSX Content</div>,
-            "Item 4",
-            <div key="jsx-item-2">Custom JSX Content</div>,
-            "https://images.unsplash.com/photo-1723403804231-f4e9b515fe9d?q=80&w=3870&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            "Item 5",
-            <div key="jsx-item-2">Custom JSX Content</div>,
-            "Item 7",
-            <div key="jsx-item-2">Custom JSX Content</div>,
-            "https://images.unsplash.com/photo-1723403804231-f4e9b515fe9d?q=80&w=3870&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            "Item 8",
-            <div key="jsx-item-2">Custom JSX Content</div>,
-            "Item 10",
-            <div key="jsx-item-3">Custom JSX Content</div>,
-            "https://images.unsplash.com/photo-1723403804231-f4e9b515fe9d?q=80&w=3870&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            "Item 11",
-            <div key="jsx-item-2">Custom JSX Content</div>,
-            "Item 13",
-            <div key="jsx-item-4">Custom JSX Content</div>,
-            "https://images.unsplash.com/photo-1723403804231-f4e9b515fe9d?q=80&w=3870&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            "Item 14",
-          ]}
-        />
+        <Bg />
+        {/* <div className="fixed inset-0 w-full h-full z-[-1]"></div> */}
       </div>
     </BrowserRouter>
   );

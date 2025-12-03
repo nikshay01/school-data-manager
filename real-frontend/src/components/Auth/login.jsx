@@ -71,7 +71,7 @@ function Login() {
 
       {/* YOUR ORIGINAL EXACT LOGIN UI — UNTOUCHED */}
       <form
-        className="flex flex-col items-center w-[456.52px] h-[429.05px] border border-white/39 rounded-[48.24px] shadow-[3px_3px_200px_rgba(0,0,0,0.418)] bg-black/6"
+        className="flex flex-col items-center w-[456.52px] h-[429.05px] border border-white/39 rounded-[48.24px] shadow-[3px_3px_200px_rgba(0,0,0,0.418)] bg-black/6 backdrop-blur-md"
         onSubmit={handleSubmit}
       >
         <h1 className="text-white font-irish-grover text-center text-[38.74px] pt-[25px]">
