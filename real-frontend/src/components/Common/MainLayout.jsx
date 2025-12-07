@@ -2,15 +2,15 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../Dashboard/Sidebar";
 
-const MainLayout = () => {
+const MainLayout = ({ userRole }) => {
   return (
-    <div className="min-h-screen w-full">
+    <div className="h-screen w-full overflow-hidden">
       {/* Sidebar - Fixed Position */}
-      <Sidebar />
+      <Sidebar userRole={userRole} />
 
       {/* Main Content Area */}
-      <div className="pl-[280px] pt-[124px] min-h-screen w-full">
-        <div className="p-8 w-full h-full">
+      <div className="pl-[280px] mt-[124px] h-[calc(100vh-124px)] w-full overflow-y-auto">
+        <div className="p-8 w-full min-h-full">
           <Outlet />
         </div>
       </div>

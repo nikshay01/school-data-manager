@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "../../index.css";
 import "../../App.css";
+import api from "../../api/axios";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -26,9 +27,10 @@ export default function Profile() {
         // Let's try to fetch by email if I added that capability?
         // I added 'getAllUsers'. I can use that and find the user.
 
-        const response = await fetch("http://localhost:5000/api/auth/users");
-        if (response.ok) {
-          const users = await response.json();
+        // ... (inside fetchProfile)
+        const response = await api.get("/auth/users");
+        if (response.status === 200) {
+          const users = response.data;
           const currentUser = users.find((u) => u.email === email);
           setUser(currentUser);
         }

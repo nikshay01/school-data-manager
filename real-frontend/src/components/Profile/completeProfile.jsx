@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../../index.css";
 import "../../App.css";
 import Button from "../Common/button";
+import api from "../../api/axios";
 
 export default function CompleteProfile() {
   const [form, setForm] = useState({
@@ -21,10 +22,9 @@ export default function CompleteProfile() {
   useEffect(() => {
     const fetchSchools = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/schools");
-        if (response.ok) {
-          const data = await response.json();
-          setSchools(data);
+        const response = await api.get("/schools");
+        if (response.status === 200) {
+          setSchools(response.data);
         } else {
           console.error("Failed to fetch schools");
         }
@@ -92,27 +92,17 @@ export default function CompleteProfile() {
         phone: form.phone,
       };
 
-      const response = await fetch(
-        "http://localhost:5000/api/auth/complete-profile",
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(apidata),
-        }
-      );
+      const response = await api.put("/auth/complete-profile", apidata);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.error("Server Error:", data.error);
-        alert(data.error || "Failed to update profile");
-      } else {
-        console.log(data);
-        alert("Profile submitted successfully!");
-      }
+      console.log(response.data);
+      alert("Profile submitted successfully!");
     } catch (err) {
       console.error("Network Error:", err);
-      alert("Something went wrong. Please try again.");
+      if (err.response && err.response.data) {
+        alert(err.response.data.error || "Failed to update profile");
+      } else {
+        alert("Something went wrong. Please try again.");
+      }
     }
   };
 

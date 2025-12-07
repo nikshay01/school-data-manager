@@ -16,6 +16,7 @@ import Fees from "./components/Dashboard/Fees";
 import Reports from "./components/Dashboard/Reports";
 import MainLayout from "./components/Common/MainLayout";
 import Bg from "./components/Common/bg.jsx";
+import api from "./api/axios";
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -28,14 +29,9 @@ const App = () => {
       if (email) {
         setIsLoggedIn(true);
         try {
-          const response = await fetch("http://localhost:5000/api/auth/me", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email }),
-          });
-          if (response.ok) {
-            const userData = await response.json();
-            setUserRole(userData.position);
+          const response = await api.post("/auth/me", { email });
+          if (response.status === 200) {
+            setUserRole(response.data.position);
           }
         } catch (error) {
           console.error("Error fetching user data:", error);
@@ -52,7 +48,7 @@ const App = () => {
 
   return (
     <BrowserRouter>
-      <div className="relative min-h-screen w-full overflow-x-hidden">
+      <div className="relative h-screen w-full overflow-hidden">
         <TopBar />
         <Routes>
           {/* Public Routes */}
@@ -67,7 +63,13 @@ const App = () => {
 
           {/* Protected Routes */}
           <Route
-            element={isLoggedIn ? <MainLayout /> : <Navigate to="/login" />}
+            element={
+              isLoggedIn ? (
+                <MainLayout userRole={userRole} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
           >
             <Route path="/complete-profile" element={<CompleteProfile />} />
             <Route path="/dashboard" element={<UserDashboard />} />

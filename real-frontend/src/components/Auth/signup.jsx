@@ -4,6 +4,7 @@ import "../../App.css";
 import Button from "../Common/button.jsx";
 import "../../index.css";
 import SignupResult from "./signupResult";
+import api from "../../api/axios";
 
 function Signup() {
   const [formValues, setFormValues] = useState({
@@ -38,34 +39,31 @@ function Signup() {
     setResult({ status: "loading", message: "" });
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formValues.email,
-          password: formValues.password,
-        }),
+      const response = await api.post("/auth/signup", {
+        email: formValues.email,
+        password: formValues.password,
       });
 
-      const data = await response.json();
+      setResult({ status: "success", message: "Signup successful!" });
+      localStorage.setItem("email", formValues.email);
+      window.location.reload();
 
-      if (!response.ok) {
-        setResult({ status: "error", message: data.error || "Signup failed" });
-      } else {
-        setResult({ status: "success", message: "Signup successful!" });
-        localStorage.setItem("email", formValues.email);
-        window.location.reload();
-
-        // Clear fields after success
-        setFormValues({
-          email: "",
-          otp: "",
-          password: "",
-          confirmPassword: "",
+      // Clear fields after success
+      setFormValues({
+        email: "",
+        otp: "",
+        password: "",
+        confirmPassword: "",
+      });
+    } catch (error) {
+      if (error.response && error.response.data) {
+        setResult({
+          status: "error",
+          message: error.response.data.error || "Signup failed",
         });
+      } else {
+        setResult({ status: "error", message: "Network error during signup." });
       }
-    } catch {
-      setResult({ status: "error", message: "Network error during signup." });
     } finally {
       setLoading(false);
     }

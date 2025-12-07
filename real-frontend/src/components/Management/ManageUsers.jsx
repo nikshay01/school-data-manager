@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../../index.css";
 import "../../App.css";
+  import api from "../../api/axios";
 
 export default function ManageUsers() {
   const [users, setUsers] = useState([]);
@@ -10,12 +11,15 @@ export default function ManageUsers() {
     fetchUsers();
   }, []);
 
+
+  // ... (imports)
+
+  // ... (inside ManageUsers)
   const fetchUsers = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/auth/users");
-      if (response.ok) {
-        const data = await response.json();
-        setUsers(data);
+      const response = await api.get("/auth/users");
+      if (response.status === 200) {
+        setUsers(response.data);
       }
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -27,13 +31,8 @@ export default function ManageUsers() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/auth/users/${id}`,
-        {
-          method: "DELETE",
-        }
-      );
-      if (response.ok) {
+      const response = await api.delete(`/auth/users/${id}`);
+      if (response.status === 200) {
         setUsers(users.filter((user) => user._id !== id));
         alert("User deleted successfully");
       } else {
@@ -46,15 +45,10 @@ export default function ManageUsers() {
 
   const handleRoleChange = async (id, newRole) => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/auth/users/${id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ position: newRole }),
-        }
-      );
-      if (response.ok) {
+      const response = await api.put(`/auth/users/${id}`, {
+        position: newRole,
+      });
+      if (response.status === 200) {
         setUsers(
           users.map((user) =>
             user._id === id ? { ...user, position: newRole } : user

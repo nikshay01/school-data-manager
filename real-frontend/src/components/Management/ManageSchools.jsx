@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../../index.css";
 import "../../App.css";
+import api from "../../api/axios";
 
 export default function ManageSchools() {
   const [schools, setSchools] = useState([]);
@@ -17,12 +18,15 @@ export default function ManageSchools() {
     fetchSchools();
   }, []);
 
+
+  // ... (imports)
+
+  // ... (inside ManageSchools)
   const fetchSchools = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/schools");
-      if (response.ok) {
-        const data = await response.json();
-        setSchools(data);
+      const response = await api.get("/schools");
+      if (response.status === 200) {
+        setSchools(response.data);
       }
     } catch (error) {
       console.error("Error fetching schools:", error);
@@ -38,13 +42,9 @@ export default function ManageSchools() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:5000/api/schools", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newSchool),
-      });
-      if (response.ok) {
-        const createdSchool = await response.json();
+      const response = await api.post("/schools", newSchool);
+      if (response.status === 201 || response.status === 200) {
+        const createdSchool = response.data;
         setSchools([...schools, createdSchool]);
         setNewSchool({
           name: "",

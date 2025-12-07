@@ -4,6 +4,7 @@ import "../../App.css";
 import Button from "../Common/button.jsx";
 import "../../index.css";
 import LoginResult from "./loginResult";
+import api from "../../api/axios";
 
 function Login() {
   const [formValues, setFormValues] = useState({
@@ -30,29 +31,23 @@ function Login() {
     setResult({ status: "loading", message: "" });
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formValues.email,
-          password: formValues.password,
-        }),
+      const response = await api.post("/auth/login", {
+        email: formValues.email,
+        password: formValues.password,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        setResult({ status: "error", message: data.error });
+      setResult({ status: "success", message: "Login successful!" });
+      localStorage.setItem("email", formValues.email);
+      window.location.reload();
+    } catch (error) {
+      if (error.response && error.response.data) {
+        setResult({ status: "error", message: error.response.data.error });
       } else {
-        setResult({ status: "success", message: "Login successful!" });
-        localStorage.setItem("email", formValues.email);
-        window.location.reload();
+        setResult({
+          status: "error",
+          message: "Network error during login.",
+        });
       }
-    } catch {
-      setResult({
-        status: "error",
-        message: "Network error during login.",
-      });
     } finally {
       setLoading(false);
     }

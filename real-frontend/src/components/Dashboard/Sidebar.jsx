@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 
-const Sidebar = () => {
+const Sidebar = ({ userRole }) => {
   const location = useLocation();
 
   const menuItems = [
@@ -11,6 +11,10 @@ const Sidebar = () => {
     { path: "/profile", label: "PROFILE" },
     { path: "/reports", label: "REPORTS" },
   ];
+
+  if (userRole === "admin") {
+    menuItems.push({ path: "/admin", label: "ADMIN" });
+  }
 
   return (
     <div className="fixed left-0 top-[124px] h-[calc(100vh-124px)] w-[280px] bg-black/30 backdrop-blur-md border-r border-white/10 flex flex-col py-8 px-4 overflow-y-auto z-40">

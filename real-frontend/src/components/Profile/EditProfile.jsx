@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../../index.css";
 import "../../App.css";
 import Button from "../Common/button";
+import api from "../../api/axios";
 
 export default function EditProfile() {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ export default function EditProfile() {
     address: "",
     gender: "",
     phone: "",
-  });
+  }); //k
 
   const [schools, setSchools] = useState([]);
   const [errors, setErrors] = useState({});
@@ -26,22 +27,18 @@ export default function EditProfile() {
     const fetchData = async () => {
       try {
         // Fetch Schools
-        const schoolsRes = await fetch("http://localhost:5000/api/schools");
-        if (schoolsRes.ok) {
-          setSchools(await schoolsRes.json());
+        const schoolsRes = await api.get("/schools");
+        if (schoolsRes.status === 200) {
+          setSchools(schoolsRes.data);
         }
 
         // Fetch User Data
         const email = localStorage.getItem("email");
         if (email) {
-          const response = await fetch("http://localhost:5000/api/auth/me", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email }),
-          });
+          const response = await api.post("/auth/me", { email });
 
-          if (response.ok) {
-            const currentUser = await response.json();
+          if (response.status === 200) {
+            const currentUser = response.data;
             setIsAdmin(currentUser.position === "admin");
             setForm({
               username: currentUser.username || "",
@@ -115,25 +112,19 @@ export default function EditProfile() {
         phone: form.phone,
       };
 
-      const response = await fetch(
-        "http://localhost:5000/api/auth/complete-profile",
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(apidata),
-        }
-      );
+      const response = await api.put("/auth/complete-profile", apidata);
 
-      const data = await response.json();
-      if (!response.ok) {
-        alert(data.error || "Failed to update profile");
-      } else {
+      if (response.status === 200) {
         alert("Profile updated successfully!");
         navigate("/profile");
       }
     } catch (err) {
       console.error("Network Error:", err);
-      alert("Something went wrong. Please try again.");
+      if (err.response && err.response.data) {
+        alert(err.response.data.error || "Failed to update profile");
+      } else {
+        alert("Something went wrong. Please try again.");
+      }
     }
   };
 
