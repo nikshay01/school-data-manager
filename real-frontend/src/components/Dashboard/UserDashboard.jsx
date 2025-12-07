@@ -10,7 +10,7 @@ export default function UserDashboard() {
         DASHBOARD
       </h1>
 
-      <div className="bg-black/20 border border-white/10 rounded-[32px] p-8 backdrop-blur-md w-full h-full flex items-center justify-center">
+      <div className="glass-surface bg-black/20 border border-white/10 rounded-[32px] p-8 backdrop-blur-md w-full h-full flex items-center justify-center">
         <p className="text-white/60 text-xl">
           Select an option from the sidebar to get started.
         </p>
