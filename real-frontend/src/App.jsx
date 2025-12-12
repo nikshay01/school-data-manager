@@ -22,6 +22,7 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState(null);
+  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -32,6 +33,7 @@ const App = () => {
           const response = await api.post("/auth/me", { email });
           if (response.status === 200) {
             setUserRole(response.data.position);
+            setUserData(response.data);
           }
         } catch (error) {
           console.error("Error fetching user data:", error);
@@ -49,7 +51,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <div className="relative h-screen w-full overflow-hidden">
-        <TopBar />
+        <TopBar userData={userData} />
         <Routes>
           {/* Public Routes */}
           <Route
