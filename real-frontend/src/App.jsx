@@ -17,6 +17,7 @@ import Reports from "./components/Dashboard/Reports";
 import MainLayout from "./components/Common/MainLayout";
 import Bg from "./components/Common/bg.jsx";
 import api from "./api/axios";
+import gridBg from "./assets/grid.jpg";
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -51,6 +52,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <div className="relative h-screen w-full overflow-hidden">
+        {/* ... (rest of the component) */}
         <TopBar userData={userData} />
         <Routes>
           {/* Public Routes */}
@@ -87,8 +89,8 @@ const App = () => {
             <Route
               path="/admin"
               element={
-                userRole === "admin" ? (
-                  <AdminDashboard />
+                userRole === "admin" || userRole === "principal" ? (
+                  <AdminDashboard userRole={userRole} />
                 ) : (
                   <Navigate to="/dashboard" />
                 )
@@ -113,8 +115,14 @@ const App = () => {
             element={<Navigate to={isLoggedIn ? "/dashboard" : "/login"} />}
           />
         </Routes>
-        <Bg />
-        {/* <div className="fixed inset-0 w-full h-full z-[-1]"></div> */}
+        {/* <Bg /> */}
+        <div className="fixed inset-0 w-full h-full z-[-1]">
+          <img
+            src={gridBg}
+            alt="Background"
+            className="w-full h-full object-cover opacity-50"
+          />
+        </div>
       </div>
     </BrowserRouter>
   );

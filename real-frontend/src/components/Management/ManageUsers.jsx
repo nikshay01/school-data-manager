@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../../index.css";
 import "../../App.css";
-  import api from "../../api/axios";
+import api from "../../api/axios";
 
 export default function ManageUsers() {
   const [users, setUsers] = useState([]);
@@ -10,7 +10,6 @@ export default function ManageUsers() {
   useEffect(() => {
     fetchUsers();
   }, []);
-
 
   // ... (imports)
 
@@ -96,6 +95,7 @@ export default function ManageUsers() {
                     <option value="admin">Admin</option>
                     <option value="clerk">Clerk</option>
                     <option value="staff">Staff</option>
+                    <option value="principal">Principal</option>
                   </select>
                 </td>
                 <td className="p-4">

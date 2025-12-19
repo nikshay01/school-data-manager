@@ -3,7 +3,7 @@ import { Link, Outlet } from "react-router-dom";
 import "../../index.css";
 import "../../App.css";
 
-export default function AdminDashboard() {
+export default function AdminDashboard({ userRole }) {
   return (
     <div className="flex flex-col items-center w-full pb-10">
       <h1 className="text-white font-irish-grover text-[48px] tracking-wide mb-8">
@@ -21,11 +21,13 @@ export default function AdminDashboard() {
             MANAGE USERS
           </button>
         </Link>
-        <Link to="/admin/schools">
-          <button className="px-8 py-3 bg-white/10 border border-white/30 rounded-xl text-white font-bold hover:bg-white/20 transition-all">
-            MANAGE SCHOOLS
-          </button>
-        </Link>
+        {userRole === "admin" && (
+          <Link to="/admin/schools">
+            <button className="px-8 py-3 bg-white/10 border border-white/30 rounded-xl text-white font-bold hover:bg-white/20 transition-all">
+              MANAGE SCHOOLS
+            </button>
+          </Link>
+        )}
       </div>
 
       <div className="w-[90%] max-w-[1200px] bg-black/20 border border-white/10 rounded-[32px] p-8 backdrop-blur-md">

@@ -9,13 +9,13 @@ const ProfileSummary = ({ userData }) => {
   return (
     <Link
       to="/profile"
-      className="block h-[82px] w-[213px] mt-[20px] ml-[38px] border border-white/50 rounded-[30px] bg-gradient-to-t from-white/20 to-black/0 bg-clip-padding hover:bg-white/10 transition-all cursor-pointer"
+      className="block h-[62px] w-[160px] mt-[15px] ml-[29px] border border-white/50 rounded-[22px] bg-gradient-to-t from-white/20 to-black/0 bg-clip-padding hover:bg-white/10 transition-all cursor-pointer"
     >
       {/* Avatar Icon */}
-      <div className="h-[59px] w-[59px] ml-[13px] mt-[12px]">
+      <div className="h-[44px] w-[44px] ml-[10px] mt-[9px]">
         <svg
-          width="59"
-          height="59"
+          width="44"
+          height="44"
           viewBox="0 0 59 59"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -41,12 +41,12 @@ const ProfileSummary = ({ userData }) => {
       </div>
 
       {/* Text */}
-      <div className="ml-[75px] h-[51px] w-[140px] mt-[-59px]">
-        <p className="uppercase jul truncate text-white text-sm">
+      <div className="ml-[56px] h-[38px] w-[105px] mt-[-44px]">
+        <p className="uppercase jul truncate text-white text-xs">
           {schoolName}
         </p>
-        <p className="uppercase jul truncate text-white text-sm">{username}</p>
-        <p className="uppercase jul truncate text-white text-xs opacity-80">
+        <p className="uppercase jul truncate text-white text-xs">{username}</p>
+        <p className="uppercase jul truncate text-white text-[10px] opacity-80">
           {role}
         </p>
       </div>

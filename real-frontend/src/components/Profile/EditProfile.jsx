@@ -165,6 +165,7 @@ export default function EditProfile() {
               name="school"
               value={form.school}
               onChange={handleChange}
+              disabled={!isAdmin}
             >
               <option value="" disabled className="text-black">
                 SELECT SCHOOL
@@ -208,6 +209,9 @@ export default function EditProfile() {
               </option>
               <option className="text-black" value="staff">
                 Staff
+              </option>
+              <option className="text-black" value="principal">
+                Principal
               </option>
             </select>
             {errors.role && (

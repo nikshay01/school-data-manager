@@ -42,7 +42,7 @@ const userSchema = new mongoose.Schema(
 
     position: {
       type: String,
-      enum: ["teacher", "admin", "clerk", "staff"],
+      enum: ["teacher", "admin", "clerk", "staff", "principal"],
       default: "staff",
       required: true,
     },
