@@ -24,6 +24,8 @@ const StudentTable = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [showColumnSelector, setShowColumnSelector] = useState(false);
   const [showFilterPanel, setShowFilterPanel] = useState(false);
+  const [rowDensity, setRowDensity] = useState("standard");
+  const [showDensitySelector, setShowDensitySelector] = useState(false);
 
   const [columns, setColumns] = useState([
     {
@@ -244,6 +246,36 @@ const StudentTable = () => {
             >
               ⚙ COLUMNS
             </button>
+
+            <div className="relative">
+              <button
+                onClick={() => setShowDensitySelector(!showDensitySelector)}
+                className="px-4 py-2 bg-white/10 border border-white/30 rounded-xl text-white font-bold hover:bg-white/20 transition-all"
+              >
+                ≡ DENSITY
+              </button>
+
+              {showDensitySelector && (
+                <div className="absolute right-0 top-full mt-2 w-40 bg-black/90 border border-white/20 rounded-xl shadow-xl backdrop-blur-xl z-50 overflow-hidden flex flex-col">
+                  {["compact", "standard", "comfortable"].map((density) => (
+                    <button
+                      key={density}
+                      onClick={() => {
+                        setRowDensity(density);
+                        setShowDensitySelector(false);
+                      }}
+                      className={`px-4 py-3 text-left text-sm font-medium transition-colors ${
+                        rowDensity === density
+                          ? "bg-blue-500/20 text-blue-300"
+                          : "text-white/70 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      {density.charAt(0).toUpperCase() + density.slice(1)}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -300,6 +332,7 @@ const StudentTable = () => {
                     student={student}
                     index={index}
                     columns={columns}
+                    density={rowDensity}
                     onRowClick={setSelectedStudent}
                   />
                 ))
