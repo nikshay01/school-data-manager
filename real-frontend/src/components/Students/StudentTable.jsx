@@ -26,6 +26,7 @@ const StudentTable = () => {
   const [showFilterPanel, setShowFilterPanel] = useState(false);
   const [rowDensity, setRowDensity] = useState("standard");
   const [showDensitySelector, setShowDensitySelector] = useState(false);
+  const [notification, setNotification] = useState(null);
 
   const [columns, setColumns] = useState([
     {
@@ -214,8 +215,31 @@ const StudentTable = () => {
     );
   };
 
+  const showNotification = (message, type = "success") => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
+
   return (
     <div className="w-full h-full flex flex-col items-center pt-4 px-4 relative">
+      {/* Notification Toast */}
+      {notification && (
+        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-[100] animate-fade-in-down">
+          <div
+            className={`px-6 py-3 rounded-xl shadow-2xl backdrop-blur-md border flex items-center gap-3 ${
+              notification.type === "success"
+                ? "bg-green-500/20 border-green-500/50 text-green-200"
+                : "bg-red-500/20 border-red-500/50 text-red-200"
+            }`}
+          >
+            <span className="text-xl">
+              {notification.type === "success" ? "✅" : "❌"}
+            </span>
+            <span className="font-medium">{notification.message}</span>
+          </div>
+        </div>
+      )}
+
       {/* Header Area */}
       <div className="w-full max-w-[1400px] flex flex-col gap-6 mb-6">
         <div className="flex justify-between items-end">
@@ -252,7 +276,7 @@ const StudentTable = () => {
                 onClick={() => setShowDensitySelector(!showDensitySelector)}
                 className="px-4 py-2 bg-white/10 border border-white/30 rounded-xl text-white font-bold hover:bg-white/20 transition-all"
               >
-                ≡ DENSITY
+                ≡ ROW HEIGHT
               </button>
 
               {showDensitySelector && (
@@ -334,6 +358,7 @@ const StudentTable = () => {
                     columns={columns}
                     density={rowDensity}
                     onRowClick={setSelectedStudent}
+                    onCopy={showNotification}
                   />
                 ))
               ) : (
