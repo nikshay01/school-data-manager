@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import mockStudents from "../../data/mockStudents";
+import axios from "axios";
+// import mockStudents from "../../data/mockStudents";
 import StudentRow from "./StudentRow";
 import TableHeader from "./TableHeader";
 import SearchBar from "./SearchBar";
@@ -10,7 +11,9 @@ import StudentProfileModal from "./StudentProfileModal";
 
 const StudentTable = () => {
   // --- State ---
-  const [allStudents] = useState(mockStudents);
+  const [allStudents, setAllStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [displayedStudents, setDisplayedStudents] = useState([]);
 
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
@@ -47,10 +50,87 @@ const StudentTable = () => {
     { key: "srNo", label: "SR No.", sortable: true, hidden: false },
     { key: "aadhar", label: "Aadhar", sortable: true, hidden: false },
     { key: "fees", label: "Fees Status", sortable: false, hidden: false },
+    { key: "address", label: "Address", sortable: true, hidden: true },
+    { key: "State", label: "State", sortable: true, hidden: true },
+    { key: "contact", label: "Contact", sortable: true, hidden: true },
+    { key: "adDate", label: "Admission Date", sortable: true, hidden: true },
+    { key: "dob", label: "Date of Birth", sortable: true, hidden: true },
+    { key: "penID", label: "PEN ID", sortable: true, hidden: true },
+    { key: "apaarID", label: "APAAR ID", sortable: true, hidden: true },
+    { key: "leftSchool", label: "Left School", sortable: true, hidden: true },
+    { key: "tcNumber", label: "TC Number", sortable: true, hidden: true },
+    {
+      key: "udiseRemoved",
+      label: "UDISE Removed",
+      sortable: true,
+      hidden: true,
+    },
+    { key: "leftDate", label: "Left Date", sortable: true, hidden: true },
     { key: "actions", label: "Actions", sortable: false, hidden: false },
   ]);
 
   const observerTarget = useRef(null);
+
+  // --- Data Fetching ---
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(
+          "http://localhost:5000/api/students/0"
+        );
+        const processedData = response.data.map(processStudentData);
+        setAllStudents(processedData);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching students:", err);
+        setError(
+          "Failed to load student data. Please ensure the backend is running."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStudents();
+  }, []);
+
+  const processStudentData = (student) => {
+    // Calculate fees
+    const totalFee =
+      (student.fees?.adFee || 0) +
+      (student.fees?.fee || 0) +
+      (student.fees?.bus || 0) +
+      (student.fees?.hostel || 0) -
+      (student.fees?.discount || 0);
+
+    const receivedFee =
+      student.payments?.reduce((sum, p) => sum + p.amount, 0) || 0;
+
+    return {
+      ...student,
+      id: student._id, // Map MongoDB _id to id
+      studentName: student.studentName,
+      fatherName: student.fatherName || "—",
+      class: student.class || "—",
+      section: student.section || "—",
+      srNo: student.srNo || "—",
+      aadhar: student.aadhar ? String(student.aadhar) : "—",
+      studentPhoto: student.studentPhoto
+        ? student.studentPhoto // If it's a URL (future proofing)
+        : `https://ui-avatars.com/api/?name=${student.studentName}&background=random`,
+      feeSummary: {
+        total: totalFee,
+        received: receivedFee,
+        due: totalFee - receivedFee,
+      },
+      // Ensure dates are formatted if needed, or keep as is for now
+      adDate: student.adDate
+        ? new Date(student.adDate).toLocaleDateString()
+        : "—",
+      dob: student.dob ? new Date(student.dob).toLocaleDateString() : "—",
+    };
+  };
 
   // --- Logic ---
 
@@ -219,6 +299,39 @@ const StudentTable = () => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 3000);
   };
+
+  if (loading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center text-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-lg font-medium animate-pulse">
+            Loading Students...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full h-full flex items-center justify-center text-white">
+        <div className="bg-red-500/10 border border-red-500/50 p-8 rounded-2xl text-center max-w-md backdrop-blur-md">
+          <div className="text-4xl mb-4">⚠️</div>
+          <h3 className="text-xl font-bold text-red-400 mb-2">
+            Connection Error
+          </h3>
+          <p className="text-white/70 mb-6">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors font-medium"
+          >
+            Retry Connection
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-full flex flex-col items-center pt-4 px-4 relative">
