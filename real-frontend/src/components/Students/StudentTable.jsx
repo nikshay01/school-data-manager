@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import axios from "axios";
+import api from "../../api/axios";
 // import mockStudents from "../../data/mockStudents";
 import StudentRow from "./StudentRow";
 import TableHeader from "./TableHeader";
@@ -76,9 +76,7 @@ const StudentTable = () => {
     const fetchStudents = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
-          "http://localhost:5000/api/students/0"
-        );
+        const response = await api.get("/students/0");
         const processedData = response.data.map(processStudentData);
         setAllStudents(processedData);
         setError(null);
@@ -495,7 +493,81 @@ const StudentTable = () => {
       {selectedStudent && (
         <StudentProfileModal
           student={selectedStudent}
+          students={processedStudents}
+          onChangeStudent={setSelectedStudent}
           onClose={() => setSelectedStudent(null)}
+          onUpdate={async (updatedStudentData) => {
+            try {
+              // 1. Sanitize Data for Backend
+              const payload = { ...updatedStudentData };
+
+              // Remove calculated/frontend-only fields
+              delete payload.feeSummary;
+              delete payload.id;
+              delete payload._id; // ID is in the URL
+              delete payload.createdAt;
+              delete payload.updatedAt;
+              delete payload.__v;
+              delete payload.serialNumber; // If it exists
+
+              // Handle Dates: Convert "—" or invalid strings back to null or valid ISO strings
+              const parseDate = (dateVal) => {
+                if (!dateVal || dateVal === "—") return null;
+                return dateVal;
+              };
+
+              payload.adDate = parseDate(payload.adDate);
+              payload.dob = parseDate(payload.dob);
+              payload.leftDate = parseDate(payload.leftDate);
+
+              // Handle Numbers: Convert "—" to 0
+              const parseNumber = (numVal) => {
+                if (!numVal || numVal === "—") return 0;
+                const parsed = Number(numVal);
+                return isNaN(parsed) ? 0 : parsed;
+              };
+
+              payload.aadhar = parseNumber(payload.aadhar);
+              payload.contact = parseNumber(payload.contact);
+              payload.penID = parseNumber(payload.penID);
+
+              // Handle studentPhoto
+              if (
+                typeof payload.studentPhoto === "string" &&
+                payload.studentPhoto.startsWith("http")
+              ) {
+                delete payload.studentPhoto;
+              }
+
+              // 2. Optimistic Update (UI)
+              const processedUpdate = processStudentData({
+                ...updatedStudentData,
+                _id: updatedStudentData.id || updatedStudentData._id,
+              });
+
+              setAllStudents((prev) =>
+                prev.map((s) =>
+                  s.id === processedUpdate.id ? processedUpdate : s
+                )
+              );
+              setSelectedStudent(processedUpdate);
+
+              // 3. API Call
+              await api.put(`/students/${processedUpdate.id}`, payload);
+
+              showNotification("Student updated successfully", "success");
+            } catch (err) {
+              console.error("Failed to update student:", err);
+              if (err.response) {
+                console.error("Backend Error Data:", err.response.data);
+                console.error("Backend Error Status:", err.response.status);
+              }
+              showNotification(
+                "Failed to update student. Check console for details.",
+                "error"
+              );
+            }
+          }}
         />
       )}
     </div>
