@@ -10,6 +10,7 @@ const Sidebar = ({ userRole }) => {
     { path: "/fees", label: "FEES" },
     { path: "/profile", label: "PROFILE" },
     { path: "/reports", label: "REPORTS" },
+    { path: "/logs", label: "LOGS" },
   ];
 
   if (userRole === "admin") {

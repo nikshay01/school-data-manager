@@ -8,6 +8,7 @@ import PaginationController from "./PaginationController";
 import ColumnSelectorPanel from "./ColumnSelectorPanel";
 import FilterPanel from "./FilterPanel";
 import StudentProfileModal from "./StudentProfileModal";
+import FeesModal from "./FeesModal";
 
 const StudentTable = () => {
   // --- State ---
@@ -25,6 +26,7 @@ const StudentTable = () => {
   const [loadedCount, setLoadedCount] = useState(20);
 
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [activeFeeModal, setActiveFeeModal] = useState(null); // { type: 'add'|'edit'|'history', student: ... }
   const [showColumnSelector, setShowColumnSelector] = useState(false);
   const [showFilterPanel, setShowFilterPanel] = useState(false);
   const [rowDensity, setRowDensity] = useState("standard");
@@ -298,6 +300,80 @@ const StudentTable = () => {
     setTimeout(() => setNotification(null), 3000);
   };
 
+  const handleFeeAction = (type, student) => {
+    setActiveFeeModal({ type, student });
+  };
+
+  const handleFeeUpdate = async (updatedStudentData) => {
+    try {
+      // 1. Sanitize Data for Backend
+      const payload = { ...updatedStudentData };
+
+      // Remove calculated/frontend-only fields
+      delete payload.feeSummary;
+      delete payload.id;
+      delete payload._id; // ID is in the URL
+      delete payload.createdAt;
+      delete payload.updatedAt;
+      delete payload.__v;
+      delete payload.serialNumber;
+
+      // Handle Dates
+      const parseDate = (dateVal) => {
+        if (!dateVal || dateVal === "—") return null;
+        return dateVal;
+      };
+      payload.adDate = parseDate(payload.adDate);
+      payload.dob = parseDate(payload.dob);
+      payload.leftDate = parseDate(payload.leftDate);
+
+      // Handle Numbers
+      const parseNumber = (numVal) => {
+        if (!numVal || numVal === "—") return 0;
+        const parsed = Number(numVal);
+        return isNaN(parsed) ? 0 : parsed;
+      };
+      payload.aadhar = parseNumber(payload.aadhar);
+      payload.contact = parseNumber(payload.contact);
+      payload.penID = parseNumber(payload.penID);
+
+      // Handle studentPhoto
+      if (
+        typeof payload.studentPhoto === "string" &&
+        payload.studentPhoto.startsWith("http")
+      ) {
+        delete payload.studentPhoto;
+      }
+
+      // 2. Optimistic Update (UI)
+      const processedUpdate = processStudentData({
+        ...updatedStudentData,
+        _id: updatedStudentData.id || updatedStudentData._id,
+      });
+
+      setAllStudents((prev) =>
+        prev.map((s) => (s.id === processedUpdate.id ? processedUpdate : s))
+      );
+
+      // Update the student in the modal if it's open
+      if (activeFeeModal && activeFeeModal.student.id === processedUpdate.id) {
+        setActiveFeeModal((prev) => ({ ...prev, student: processedUpdate }));
+      }
+
+      // 3. API Call
+      await api.put(`/students/${processedUpdate.id}`, payload);
+
+      showNotification("Student fees updated successfully", "success");
+      // Close modal if it was an add payment action (optional, maybe keep open for history?)
+      if (activeFeeModal?.type === "add") {
+        setActiveFeeModal(null);
+      }
+    } catch (err) {
+      console.error("Failed to update student fees:", err);
+      showNotification("Failed to update fees", "error");
+    }
+  };
+
   if (loading) {
     return (
       <div className="w-full h-full flex items-center justify-center text-white">
@@ -366,7 +442,7 @@ const StudentTable = () => {
           <div className="flex gap-4">
             <button
               onClick={() => setShowFilterPanel(true)}
-              className={`px-4 py-2 rounded-xl border transition-all flex items-center gap-2 font-bold ${
+              className={`px-4 py-2 rounded-xl border transition-all flex items-center gap-2 font-bold backdrop-blur-md ${
                 filters.length > 0
                   ? "bg-red-500/20 border-red-500 text-red-300 animate-pulse"
                   : "bg-white/10 border-white/30 text-white hover:bg-white/20"
@@ -377,7 +453,7 @@ const StudentTable = () => {
             </button>
             <button
               onClick={() => setShowColumnSelector(!showColumnSelector)}
-              className="px-4 py-2 bg-white/10 border border-white/30 rounded-xl text-white font-bold hover:bg-white/20 transition-all"
+              className="px-4 py-2 backdrop-blur-md bg-white/10 border border-white/30 rounded-xl text-white font-bold hover:bg-white/20 transition-all"
             >
               ⚙ COLUMNS
             </button>
@@ -385,13 +461,13 @@ const StudentTable = () => {
             <div className="relative">
               <button
                 onClick={() => setShowDensitySelector(!showDensitySelector)}
-                className="px-4 py-2 bg-white/10 border border-white/30 rounded-xl text-white font-bold hover:bg-white/20 transition-all"
+                className="px-4 py-2 backdrop-blur-md bg-white/10 border border-white/30 rounded-xl text-white font-bold hover:bg-white/20 transition-all"
               >
                 ≡ ROW HEIGHT
               </button>
 
               {showDensitySelector && (
-                <div className="absolute right-0 top-full mt-2 w-40 bg-black/90 border border-white/20 rounded-xl shadow-xl backdrop-blur-xl z-50 overflow-hidden flex flex-col">
+                <div className="absolute right-0 top-full mt-2 w-40  border border-white/20 rounded-xl shadow-xl backdrop-blur-xl z-50 overflow-hidden flex flex-col">
                   {["compact", "standard", "comfortable"].map((density) => (
                     <button
                       key={density}
@@ -432,7 +508,7 @@ const StudentTable = () => {
       </div>
 
       {/* Main Table Container */}
-      <div className="w-full max-w-[1400px] flex-1 bg-black/20 border border-white/10 rounded-[32px] p-6 backdrop-blur-md overflow-hidden flex flex-col relative">
+      <div className="w-full max-w-[1400px] flex-1 bg-black/40 border border-white/10 rounded-[32px] p-6 backdrop-blur-sm  overflow-hidden flex flex-col relative">
         {/* Floating Panels */}
         {showColumnSelector && (
           <ColumnSelectorPanel
@@ -470,6 +546,7 @@ const StudentTable = () => {
                     density={rowDensity}
                     onRowClick={setSelectedStudent}
                     onCopy={showNotification}
+                    onFeeAction={handleFeeAction}
                   />
                 ))
               ) : (
@@ -496,6 +573,7 @@ const StudentTable = () => {
           students={processedStudents}
           onChangeStudent={setSelectedStudent}
           onClose={() => setSelectedStudent(null)}
+          onFeeAction={handleFeeAction}
           onUpdate={async (updatedStudentData) => {
             try {
               // 1. Sanitize Data for Backend
@@ -570,6 +648,15 @@ const StudentTable = () => {
           }}
         />
       )}
+
+      {/* Fees Modal */}
+      <FeesModal
+        isOpen={!!activeFeeModal}
+        onClose={() => setActiveFeeModal(null)}
+        type={activeFeeModal?.type}
+        student={activeFeeModal?.student}
+        onUpdate={handleFeeUpdate}
+      />
     </div>
   );
 };

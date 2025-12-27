@@ -39,10 +39,17 @@ const Row = ({ label, value, editable, type = "text", options, onChange }) => {
 
       <button
         onClick={copyValue}
-        className="text-white/40 hover:text-white text-xs"
+        className="text-white/40 hover:text-white transition-colors"
         title="Copy"
       >
-        📋
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 448 512"
+          className="w-3 h-3"
+          fill="currentColor"
+        >
+          <path d="M192 0c-35.3 0-64 28.7-64 64l0 256c0 35.3 28.7 64 64 64l192 0c35.3 0 64-28.7 64-64l0-200.6c0-17.4-7.1-34.1-19.7-46.2L370.6 17.8C358.7 6.4 342.8 0 326.3 0L192 0zM64 128c-35.3 0-64 28.7-64 64L0 448c0 35.3 28.7 64 64 64l192 0c35.3 0 64-28.7 64-64l0-16-64 0 0 16-192 0 0-256 16 0 0-64-16 0z" />
+        </svg>
       </button>
     </div>
   );
@@ -55,6 +62,7 @@ const StudentProfileModal = ({
   onChangeStudent,
   onClose,
   onUpdate,
+  onFeeAction,
 }) => {
   if (!student) return null;
 
@@ -256,8 +264,11 @@ const StudentProfileModal = ({
               ← PREVIOUS
             </button>
 
-            <button className="px-6 py-2 rounded-full bg-white/20 text-white backdrop-blur-md">
-              FEE ACTION
+            <button
+              onClick={() => onFeeAction && onFeeAction("add", student)}
+              className="px-6 py-2 rounded-full bg-white/20 text-white backdrop-blur-md hover:bg-white/30"
+            >
+              ADD FEE
             </button>
 
             <button

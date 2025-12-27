@@ -9,6 +9,7 @@ const StudentRow = ({
   index,
   density = "standard",
   onCopy,
+  onFeeAction,
 }) => {
   const paddingClass = {
     compact: "p-[1px]",
@@ -50,7 +51,7 @@ const StudentRow = ({
         if (col.key === "actions") {
           return (
             <td key={col.key} className={`${paddingClass} align-middle`}>
-              <ActionButtonsCell student={student} />
+              <ActionButtonsCell student={student} onFeeAction={onFeeAction} />
             </td>
           );
         }

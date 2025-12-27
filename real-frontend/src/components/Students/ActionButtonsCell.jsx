@@ -10,16 +10,21 @@ const ActionButton = ({
       e.stopPropagation();
       onClick();
     }}
-    className={`px-3 py-1 rounded-lg text-[10px] font-bold border border-white/10 transition-all ${colorClass}`}
+    className={`px-[5px] py-[2px] rounded-lg text-[10px] font-bold border border-white/10 transition-all ${colorClass}`}
   >
     {label}
   </button>
 );
 
-const ActionButtonsCell = ({ student }) => {
+const ActionButtonsCell = ({ student, onFeeAction }) => {
   const handleAction = (action) => {
+    if (onFeeAction) {
+      if (action === "Add Fee") onFeeAction("add", student);
+      if (action === "Edit Fee") onFeeAction("edit_structure", student);
+      if (action === "Inquiry") onFeeAction("inquiry", student);
+      if (action === "History") onFeeAction("history", student);
+    }
     console.log(`${action} for ${student.studentName}`);
-    // Placeholder actions
   };
 
   return (

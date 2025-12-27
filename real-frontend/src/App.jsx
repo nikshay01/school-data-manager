@@ -18,6 +18,7 @@ import MainLayout from "./components/Common/MainLayout";
 import Bg from "./components/Common/bg.jsx";
 import api from "./api/axios";
 import gridBg from "./assets/grid.jpg";
+import LogViewer from "./components/Logs/LogViewer";
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -83,7 +84,10 @@ const App = () => {
             {/* Placeholder routes for Sidebar links */}
             <Route path="/students" element={<Students />} />
             <Route path="/fees" element={<Fees />} />
+            <Route path="/students" element={<Students />} />
+            <Route path="/fees" element={<Fees />} />
             <Route path="/reports" element={<Reports />} />
+            <Route path="/logs" element={<LogViewer />} />
 
             {/* Admin Routes */}
             <Route
