@@ -8,17 +8,20 @@ import {
   deleteUser,
   getCurrentUser,
 } from "../controllers/authController.js";
+import { protect, authorize } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 router.post("/signup", signupUser);
 router.post("/login", loginUser);
-router.put("/complete-profile", completeProfile);
-router.post("/me", getCurrentUser);
+
+// Protected Routes
+router.put("/complete-profile", protect, completeProfile);
+router.get("/me", protect, getCurrentUser);
 
 // Admin Routes
-router.get("/users", getAllUsers);
-router.put("/users/:id", updateUser);
-router.delete("/users/:id", deleteUser);
+router.get("/users", protect, authorize("admin"), getAllUsers);
+router.put("/users/:id", protect, authorize("admin"), updateUser);
+router.delete("/users/:id", protect, authorize("admin"), deleteUser);
 
 export default router;

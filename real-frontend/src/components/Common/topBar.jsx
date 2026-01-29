@@ -6,12 +6,12 @@ import ProfileSummary from "./ProfileSummary";
 
 function TopBar({ userData }) {
   return (
-    <div className="fixed top-0 w-[100vw] h-[93px] bg-black bg-opacity-30 backdrop-blur-xl  ">
+    <div className="fixed top-0 w-[100vw] h-[93px] bg-black bg-opacity-30 backdrop-blur-xl flex items-center justify-between px-8">
+      <ProfileSummary userData={userData} />
       {/* Logout Button */}
-      <div className="absolute right-10 top-10">
+      <div className="flex items-center">
         <Logout />
       </div>
-      <ProfileSummary userData={userData} />
     </div>
   );
 }

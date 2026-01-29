@@ -28,17 +28,24 @@ const App = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const email = localStorage.getItem("email");
-      if (email) {
+      const token = localStorage.getItem("token");
+      if (token) {
         setIsLoggedIn(true);
         try {
-          const response = await api.post("/auth/me", { email });
+          // Changed to GET /auth/me (token is attached by axios interceptor)
+          const response = await api.get("/auth/me");
           if (response.status === 200) {
             setUserRole(response.data.position);
             setUserData(response.data);
           }
         } catch (error) {
           console.error("Error fetching user data:", error);
+          // If token is invalid (401), logout
+          if (error.response && error.response.status === 401) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("email");
+            setIsLoggedIn(false);
+          }
         }
       }
       setLoading(false);

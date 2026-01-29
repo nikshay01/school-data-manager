@@ -431,7 +431,7 @@ const StudentTable = () => {
       <div className="w-full max-w-[1400px] flex flex-col gap-6 mb-6">
         <div className="flex justify-between items-end">
           <div>
-            <h1 className="text-white font-irish-grover text-[48px] tracking-wide leading-none">
+            <h1 className="text-white text-[48px] tracking-wide leading-none">
               STUDENTS
             </h1>
             <p className="text-white/50 text-sm mt-2 ml-1">
@@ -636,14 +636,12 @@ const StudentTable = () => {
               showNotification("Student updated successfully", "success");
             } catch (err) {
               console.error("Failed to update student:", err);
-              if (err.response) {
-                console.error("Backend Error Data:", err.response.data);
-                console.error("Backend Error Status:", err.response.status);
-              }
-              showNotification(
-                "Failed to update student. Check console for details.",
-                "error"
-              );
+             const errorMessage =
+                err.response?.data?.message ||
+                err.response?.data?.error ||
+                "Failed to update student.";
+
+              showNotification(errorMessage, "error");
             }
           }}
         />

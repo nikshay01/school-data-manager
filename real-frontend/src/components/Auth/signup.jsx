@@ -45,7 +45,11 @@ function Signup() {
       });
 
       setResult({ status: "success", message: "Signup successful!" });
-      localStorage.setItem("email", formValues.email);
+
+      // Store token and user details
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("email", response.data.email);
+
       window.location.reload();
 
       // Clear fields after success
@@ -56,14 +60,15 @@ function Signup() {
         confirmPassword: "",
       });
     } catch (error) {
-      if (error.response && error.response.data) {
-        setResult({
-          status: "error",
-          message: error.response.data.error || "Signup failed",
-        });
-      } else {
-        setResult({ status: "error", message: "Network error during signup." });
-      }
+      const errorMessage =
+        error.response?.data?.message || // Standardized backend error
+        error.response?.data?.error || // Legacy error format
+        "Signup failed";
+
+      setResult({
+        status: "error",
+        message: errorMessage,
+      });
     } finally {
       setLoading(false);
     }

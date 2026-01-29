@@ -1,72 +1,169 @@
 import Student from "../models/Student.js";
+import Log from "../models/Log.js";
+import asyncHandler from "express-async-handler";
 
-export const addStudent = async (req, res) => {
+const createLog = async (
+  action,
+  entity,
+  entityId,
+  details,
+  changes,
+  user,
+  ip
+) => {
   try {
-    const student = new Student(req.body);
-    await student.save();
-    res.status(201).json(student);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+    await Log.create({
+      action,
+      entity,
+      entityId,
+      details,
+      changes,
+      user: user ? user.email : "System",
+      ip,
+    });
+  } catch (error) {
+    console.error("Logging failed:", error);
   }
 };
 
-export const getStudents = async (req, res) => {
-  try {
-    const className = req.params.id;
-    const query = className == 0 ? {} : { class: className };
-    const students = await Student.find(query);
-    res.json(students);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+// @desc    Add a new student
+// @route   POST /api/students
+// @access  Private
+export const addStudent = asyncHandler(async (req, res) => {
+  const { studentName, class: className } = req.body;
+
+  if (!studentName || !className) {
+    res.status(400);
+    throw new Error("Student Name and Class are required");
   }
-};
 
-export const srNoSearch = async (req, res) => {
-  try {
-    const search = req.query.query;
-    const students = await Student.find({ srNo: search });
-    res.json(students.length ? students : 0);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  const student = new Student({
+    ...req.body,
+    school: req.user.school, // Enforce school from token
+  });
+
+  await student.save();
+
+  await createLog(
+    "CREATE",
+    "Student",
+    student._id,
+    `Created student ${student.studentName}`,
+    { after: student.toObject() },
+    req.user,
+    req.ip
+  );
+
+  res.status(201).json(student);
+});
+// @desc    Get all students (scoped to school)
+// @route   GET /api/students/class/:id
+// @access  Private
+export const getStudents = asyncHandler(async (req, res) => {
+  const className = req.params.id;
+  const query = { school: req.user.school }; // Scope to school
+
+  if (className != 0) {
+    query.class = className;
   }
-};
 
-export const getStudentById = async (req, res) => {
-  try {
-    const s = await Student.findById(req.params.id);
-    if (!s) return res.status(404).json({ message: "Not found" });
-    res.json(s);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  const students = await Student.find(query).sort({ studentName: 1 });
+  res.json(students);
+});
+
+export const srNoSearch = asyncHandler(async (req, res) => {
+  const search = req.query.query;
+  const students = await Student.find({
+    school: req.user.school,
+    srNo: { $regex: search, $options: "i" },
+  });
+  res.json(students.length ? students : 0);
+});
+
+// @desc    Get student by ID
+// @route   GET /api/students/:id
+// @access  Private
+export const getStudentById = asyncHandler(async (req, res) => {
+  const student = await Student.findOne({
+    _id: req.params.id,
+    school: req.user.school,
+  });
+
+  if (student) {
+    res.json(student);
+  } else {
+    res.status(404);
+    throw new Error("Student not found");
   }
-};
+});
 
-export const updateStudent = async (req, res) => {
-  try {
-    const updated = await Student.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
-    if (!updated) return res.status(404).json({ message: "Not found" });
+// @desc    Update student
+// @route   PUT /api/students/:id
+// @access  Private
+export const updateStudent = asyncHandler(async (req, res) => {
+  const oldStudent = await Student.findOne({
+    _id: req.params.id,
+    school: req.user.school,
+  });
 
-    res.json({ message: "Updated", updated });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  if (!oldStudent) {
+    res.status(404);
+    throw new Error("Student not found");
   }
-};
 
-export const deleteStudent = async (req, res) => {
-  try {
-    const deleted = await Student.findByIdAndDelete(req.params.id);
-    if (!deleted) return res.status(404).json({ message: "Not found" });
+  const updated = await Student.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
 
-    res.json({ message: "Deleted" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  await createLog(
+    "UPDATE",
+    "Student",
+    updated._id,
+    `Updated student ${updated.studentName}`,
+    {
+      before: oldStudent.toObject(),
+      after: updated.toObject(),
+    },
+    req.user,
+    req.ip
+  );
+
+  res.json({ message: "Updated", updated });
+});
+
+// @desc    Delete student
+// @route   DELETE /api/students/:id
+// @access  Private
+export const deleteStudent = asyncHandler(async (req, res) => {
+  const student = await Student.findOne({
+    _id: req.params.id,
+    school: req.user.school,
+  });
+
+  if (!student) {
+    res.status(404);
+    throw new Error("Student not found");
   }
-};
 
+  await student.deleteOne();
+
+  await createLog(
+    "DELETE",
+    "Student",
+    student._id,
+    `Deleted student ${student.studentName}`,
+    { before: student.toObject() },
+    req.user,
+    req.ip
+  );
+
+  res.json({ message: "Deleted" });
+});
+
+// @desc    Check password (deprecated, handled by auth middleware now)
+// @route   GET /api/students/password/:id
+// @access  Public (should be removed or protected)
 export const passwordCheck = (req, res) => {
   const pw = req.params.id;
   res.json({ message: pw == 123321 });

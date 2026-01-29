@@ -15,6 +15,17 @@ AND GIVE AN TABLE OF FEE ADDED TO THE DB FOR DAILY TO THE PRINCIPAL
 
 MAKE EVERYTHING PRINTABLE.
 
-
+changes karte time changes ka reason likhne ke liye section do
 procrastinate----------------------------------
 restructuring where is which filed of input in complete profile tab
+school management me school ki details edit karne ka option add karo
+
+
+
+
+
+
+
+
+cleanup--
+activity logs me only vo exact field show karo jise change kiya gaya hai

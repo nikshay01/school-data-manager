@@ -1,241 +1,180 @@
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import asyncHandler from "express-async-handler";
 
-// --------------------------------------
-// SIGNUP CONTROLLER
-// --------------------------------------
-export const signupUser = async (req, res) => {
-  try {
-    const { email, password } = req.body; // Extract email and password from request body
-
-    // Validate required fields
-    if (!email || !password)
-      return res
-        .status(400)
-        .json({ error: "Email and password are required." });
-
-    // Validate email format with regex
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email))
-      return res.status(400).json({ error: "Invalid email format." });
-
-    // Validate password length
-    if (password.length < 8)
-      return res
-        .status(400)
-        .json({ error: "Password must be at least 8 characters." });
-
-    // Check if the user already exists
-    const existing = await User.findOne({ email });
-    if (existing)
-      return res.status(409).json({ error: "User already exists." });
-
-    // Hash the password for safe storage
-    const hashed = await bcrypt.hash(password, 10);
-
-    // Create new user document
-    const user = new User({ email, password: hashed });
-
-    // Save to database
-    await user.save();
-
-    res.status(201).json({ message: "User registered successfully" });
-  } catch (err) {
-    console.error(err); // Log server errors
-    res.status(500).json({ error: "Internal server error" });
-  }
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: "30d",
+  });
 };
 
-// --------------------------------------
-// LOGIN CONTROLLER
-// --------------------------------------
-export const loginUser = async (req, res) => {
-  try {
-    const { email, password } = req.body; // Extract login credentials
+// @desc    Register a new user
+// @route   POST /api/auth/signup
+// @access  Public
+export const signupUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
 
-    // Find the user by email
-    // We need to explicitly select password because it's set to select: false in schema
-    const user = await User.findOne({ email }).select("+password");
+  if (!email || !password) {
+    res.status(400);
+    throw new Error("Email and password are required");
+  }
 
-    if (!user) return res.status(401).json({ error: "Invalid credentials." });
+  const userExists = await User.findOne({ email });
 
-    // Check account status
+  if (userExists) {
+    res.status(400);
+    throw new Error("User already exists");
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  const user = await User.create({
+    email,
+    password: hashedPassword,
+    username: email.split("@")[0] + Math.floor(Math.random() * 1000), // Temp username
+    school: "675c613045339d675628676d", // Placeholder, should be dynamic or handled in completeProfile
+    name: "New User", // Placeholder
+  });
+
+  if (user) {
+    res.status(201).json({
+      _id: user._id,
+      email: user.email,
+      token: generateToken(user._id),
+    });
+  } else {
+    res.status(400);
+    throw new Error("Invalid user data");
+  }
+});
+
+// @desc    Auth user & get token
+// @route   POST /api/auth/login
+// @access  Public
+export const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email }).select("+password");
+
+  if (user && (await bcrypt.compare(password, user.password))) {
     if (user.accountStatus !== "active") {
-      return res.status(403).json({ error: "Account is not active." });
+      res.status(403);
+      throw new Error("Account is not active");
     }
 
-    if (user.isDeleted) {
-      return res.status(403).json({ error: "Account has been deleted." });
-    }
+    user.lastLogin = Date.now();
+    user.failedLoginAttempts = 0;
+    await user.save();
 
-    // Compare provided password with stored hashed password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      // Increment failed login attempts (optional feature implementation)
+    res.json({
+      _id: user._id,
+      email: user.email,
+      username: user.username,
+      position: user.position,
+      school: user.school,
+      profileCompleted: user.profileCompleted,
+      token: generateToken(user._id),
+    });
+  } else {
+    if (user) {
       user.failedLoginAttempts = (user.failedLoginAttempts || 0) + 1;
       await user.save();
-      return res.status(401).json({ error: "Invalid credentials." });
     }
-
-    // Reset failed login attempts on successful login
-    user.failedLoginAttempts = 0;
-    user.lastLogin = new Date();
-    await user.save();
-
-    // Successful login (token creation can be added later)
-    res.json({ message: "Login successful" });
-  } catch (err) {
-    console.error(err); // Log server errors
-    res.status(500).json({ error: "Internal server error" });
+    res.status(401);
+    throw new Error("Invalid email or password");
   }
-};
+});
 
-// --------------------------------------
-// COMPLETE PROFILE CONTROLLER
-// --------------------------------------
-export const completeProfile = async (req, res) => {
-  try {
-    // Extract profile fields from request body
-    console.log("request reached at completeprofile controller");
+// @desc    Complete user profile
+// @route   POST /api/auth/complete-profile
+// @access  Private
+export const completeProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
 
-    const {
-      email, // Email used to find the user to update
-      username,
-      school, // Changed from schoolId to school (ObjectId)
-      position,
-      aadhar,
-      fullName, // Maps to 'name' in schema
-      address,
-      gender,
-      phone, // Maps to 'contact' in schema
-      access, // New field
-    } = req.body;
-
-    // 1️⃣ Find the user using email
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ error: "User not found." });
-    }
-
-    // 2️⃣ Validate Username
-    const usernameRegex = /^[a-zA-Z0-9_]+$/;
-    if (!usernameRegex.test(username)) {
-      return res.status(400).json({
-        error: "Username can only contain letters, numbers, and underscores.",
-      });
-    }
-    const nameTaken = await User.findOne({ username, _id: { $ne: user._id } });
-    if (nameTaken) {
-      return res.status(409).json({ error: "UserName already exists." });
-    }
-
-    // 3️⃣ Validate Aadhar (12 digits)
-    if (aadhar && !/^\d{12}$/.test(aadhar)) {
-      return res
-        .status(400)
-        .json({ error: "Aadhar number must be exactly 12 digits." });
-    }
-    const adTaken = await User.findOne({ aadhar, _id: { $ne: user._id } });
-    if (adTaken) {
-      return res
-        .status(409)
-        .json({ error: "User Aadhar number already exists." });
-    }
-
-    // 4️⃣ Validate Contact (10 digits)
-    if (phone && !/^\d{10}$/.test(phone)) {
-      return res
-        .status(400)
-        .json({ error: "Contact number must be exactly 10 digits." });
-    }
-
-    // 5️⃣ Update all profile fields
-    user.username = username;
-    user.school = school; // Expecting ObjectId
-    user.position = position;
-    user.aadhar = aadhar;
-    user.name = fullName;
-    user.address = address;
-    user.gender = gender;
-    user.contact = phone;
-    user.access = access || "employee"; // Default to employee if not provided
+  if (user) {
+    user.username = req.body.username || user.username;
+    user.name = req.body.fullName || user.name;
+    user.school = req.body.school || user.school;
+    user.position = req.body.position || user.position;
+    user.aadhar = req.body.aadhar || user.aadhar;
+    user.address = req.body.address || user.address;
+    user.gender = req.body.gender || user.gender;
+    user.contact = req.body.phone || user.contact;
     user.profileCompleted = true;
 
-    // 6️⃣ Save updated document
-    await user.save();
+    const updatedUser = await user.save();
 
-    // Send success response
-    return res.status(200).json({
-      message: "Profile completed successfully!",
-      user,
+    res.json({
+      _id: updatedUser._id,
+      username: updatedUser.username,
+      email: updatedUser.email,
+      profileCompleted: updatedUser.profileCompleted,
+      token: generateToken(updatedUser._id),
     });
-  } catch (error) {
-    console.log(error); // log internal error
-    // Handle Mongoose validation errors
-    if (error.name === "ValidationError") {
-      const messages = Object.values(error.errors).map((val) => val.message);
-      return res.status(400).json({ error: messages.join(", ") });
-    }
-    return res.status(500).json({ error: "Internal server error" });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
   }
-};
+});
 
-// --------------------------------------
-// ADMIN: GET ALL USERS
-// --------------------------------------
-export const getAllUsers = async (req, res) => {
-  try {
-    const users = await User.find().populate("school", "name code");
-    res.json(users);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
+// @desc    Get current user profile
+// @route   GET /api/auth/me
+// @access  Private
+export const getCurrentUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id).populate(
+    "school",
+    "name code"
+  );
 
-// --------------------------------------
-// ADMIN: UPDATE USER
-// --------------------------------------
-export const updateUser = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const updatedUser = await User.findByIdAndUpdate(id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-    if (!updatedUser) return res.status(404).json({ error: "User not found" });
-    res.json(updatedUser);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-// --------------------------------------
-// GET CURRENT USER
-// --------------------------------------
-export const getCurrentUser = async (req, res) => {
-  try {
-    const { email } = req.body;
-    if (!email) return res.status(400).json({ error: "Email is required" });
-
-    const user = await User.findOne({ email }).populate("school", "name code");
-    if (!user) return res.status(404).json({ error: "User not found" });
-
+  if (user) {
     res.json(user);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
   }
-};
+});
 
-// --------------------------------------
-// ADMIN: DELETE USER
-// --------------------------------------
-export const deleteUser = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const deletedUser = await User.findByIdAndDelete(id);
-    if (!deletedUser) return res.status(404).json({ error: "User not found" });
-    res.json({ message: "User deleted successfully" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+// @desc    Get all users
+// @route   GET /api/auth/users
+// @access  Private/Admin
+export const getAllUsers = asyncHandler(async (req, res) => {
+  const users = await User.find({}).populate("school", "name code");
+  res.json(users);
+});
+
+// @desc    Update user
+// @route   PUT /api/auth/users/:id
+// @access  Private/Admin
+export const updateUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+
+  if (user) {
+    user.name = req.body.name || user.name;
+    user.email = req.body.email || user.email;
+    user.position = req.body.position || user.position;
+    user.accountStatus = req.body.accountStatus || user.accountStatus;
+
+    const updatedUser = await user.save();
+    res.json(updatedUser);
+  } else {
+    res.status(404);
+    throw new Error("User not found");
   }
-};
+});
+
+// @desc    Delete user
+// @route   DELETE /api/auth/users/:id
+// @access  Private/Admin
+export const deleteUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+
+  if (user) {
+    await user.deleteOne();
+    res.json({ message: "User removed" });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
+});

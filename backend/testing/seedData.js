@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import School from "../models/School.js";
+import Student from "../models/Student.js";
 
 dotenv.config();
 
@@ -36,6 +37,15 @@ const seedData = async () => {
     );
     console.log(
       `👥 Updated ${updateResult.modifiedCount} users with school ID.`
+    );
+
+    // 2.1 Update All Existing Students
+    const studentUpdateResult = await Student.updateMany(
+      {},
+      { $set: { school: school._id } }
+    );
+    console.log(
+      `🎓 Updated ${studentUpdateResult.modifiedCount} students with school ID.`
     );
 
     // 3. Create Admin User

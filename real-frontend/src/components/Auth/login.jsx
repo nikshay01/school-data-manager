@@ -37,17 +37,22 @@ function Login() {
       });
 
       setResult({ status: "success", message: "Login successful!" });
-      localStorage.setItem("email", formValues.email);
+
+      // Store token and user details
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("email", response.data.email);
+
+      // Optional: Store other user info if needed
+      // localStorage.setItem("user", JSON.stringify(response.data));
+
       window.location.reload();
     } catch (error) {
-      if (error.response && error.response.data) {
-        setResult({ status: "error", message: error.response.data.error });
-      } else {
-        setResult({
-          status: "error",
-          message: "Network error during login.",
-        });
-      }
+      const errorMessage =
+        error.response?.data?.message || // Standardized backend error
+        error.response?.data?.error || // Legacy error format
+        "Network error during login.";
+
+      setResult({ status: "error", message: errorMessage });
     } finally {
       setLoading(false);
     }

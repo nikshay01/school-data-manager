@@ -75,13 +75,11 @@ export default function CompleteProfile() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const email = localStorage.getItem("email");
 
     if (!validateForm()) return;
 
     try {
       const apidata = {
-        email: email,
         username: form.username,
         school: form.school,
         position: form.role,
@@ -96,13 +94,20 @@ export default function CompleteProfile() {
 
       console.log(response.data);
       alert("Profile submitted successfully!");
+
+      // Update token if a new one is returned (optional but good practice)
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
+      }
+
+      window.location.href = "/dashboard"; // Redirect to dashboard
     } catch (err) {
       console.error("Network Error:", err);
-      if (err.response && err.response.data) {
-        alert(err.response.data.error || "Failed to update profile");
-      } else {
-        alert("Something went wrong. Please try again.");
-      }
+      const errorMessage =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "Failed to update profile";
+      alert(errorMessage);
     }
   };
 

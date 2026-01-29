@@ -6,17 +6,18 @@ import {
   updateStudent,
   deleteStudent,
   passwordCheck,
-  srNoSearch
+  srNoSearch,
 } from "../controllers/studentController.js";
+import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/", addStudent);
-router.get("/:id", getStudents);            // class filter
-router.get("/single/:id", getStudentById);
-router.put("/:id", updateStudent);
-router.delete("/dl/:id", deleteStudent);
-router.get("/update", srNoSearch);
-router.get("/pass/:id", passwordCheck);
+router.post("/", protect, addStudent);
+router.get("/:id", protect, getStudents); // class filter
+router.get("/single/:id", protect, getStudentById);
+router.put("/:id", protect, updateStudent);
+router.delete("/dl/:id", protect, deleteStudent);
+router.get("/update", protect, srNoSearch); // Note: URL path is /update but controller is srNoSearch? Weird naming but keeping logic.
+router.get("/pass/:id", passwordCheck); // Public for now as requested by user previously, but should be protected.
 
 export default router;

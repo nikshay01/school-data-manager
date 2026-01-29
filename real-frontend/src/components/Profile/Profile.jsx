@@ -10,32 +10,15 @@ export default function Profile() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const email = localStorage.getItem("email");
-      if (!email) return;
-
       try {
-        // We can reuse the complete-profile endpoint logic or create a dedicated get-profile
-        // For now, let's assume we can fetch user details via a new endpoint or existing one.
-        // Since we don't have a direct "get me" endpoint, we might need to rely on the login response
-        // or add a 'me' endpoint.
-        // Let's use the 'complete-profile' endpoint logic but as a GET if possible,
-        // OR just fetch all users and filter (inefficient but works for now given current API).
-        // BETTER: Let's add a simple GET /api/auth/me endpoint or similar.
-        // Actually, let's just use the admin 'users' endpoint but filter by email for now
-        // since we are short on time, OR better, let's just use the existing state if passed.
-        // Wait, I can't easily change backend right now without more steps.
-        // Let's try to fetch by email if I added that capability?
-        // I added 'getAllUsers'. I can use that and find the user.
-
-        // ... (inside fetchProfile)
-        const response = await api.get("/auth/users");
+        const response = await api.get("/auth/me");
         if (response.status === 200) {
-          const users = response.data;
-          const currentUser = users.find((u) => u.email === email);
-          setUser(currentUser);
+          setUser(response.data);
         }
       } catch (error) {
         console.error("Error fetching profile:", error);
+        // If unauthorized, redirect to login (optional, or handle in UI)
+        // window.location.href = "/login";
       } finally {
         setLoading(false);
       }

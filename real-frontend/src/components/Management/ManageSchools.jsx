@@ -18,7 +18,6 @@ export default function ManageSchools() {
     fetchSchools();
   }, []);
 
-
   // ... (imports)
 
   // ... (inside ManageSchools)
@@ -59,6 +58,7 @@ export default function ManageSchools() {
       }
     } catch (error) {
       console.error("Error adding school:", error);
+      alert(error.response?.data?.message || "Failed to add school");
     }
   };
 

@@ -32,34 +32,34 @@ export default function EditProfile() {
           setSchools(schoolsRes.data);
         }
 
-        // Fetch User Data
-        const email = localStorage.getItem("email");
-        if (email) {
-          const response = await api.post("/auth/me", { email });
+        // Fetch User Data (using token)
+        const response = await api.get("/auth/me");
 
-          if (response.status === 200) {
-            const currentUser = response.data;
-            setIsAdmin(currentUser.position === "admin");
-            setForm({
-              username: currentUser.username || "",
-              school: currentUser.school?._id || currentUser.school || "",
-              role: currentUser.position || "",
-              aadhar: currentUser.aadhar || "",
-              fullName: currentUser.name || "",
-              address: currentUser.address || "",
-              gender: currentUser.gender || "",
-              phone: currentUser.contact || "",
-            });
-          }
+        if (response.status === 200) {
+          const currentUser = response.data;
+          setIsAdmin(currentUser.position === "admin");
+          setForm({
+            username: currentUser.username || "",
+            school: currentUser.school?._id || currentUser.school || "",
+            role: currentUser.position || "",
+            aadhar: currentUser.aadhar || "",
+            fullName: currentUser.name || "",
+            address: currentUser.address || "",
+            gender: currentUser.gender || "",
+            phone: currentUser.contact || "",
+          });
         }
       } catch (error) {
         console.error("Error fetching data:", error);
+        if (error.response?.status === 401) {
+          navigate("/login");
+        }
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, []);
+  }, [navigate]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -98,10 +98,8 @@ export default function EditProfile() {
     e.preventDefault();
     if (!validateForm()) return;
 
-    const email = localStorage.getItem("email");
     try {
       const apidata = {
-        email: email,
         username: form.username,
         school: form.school,
         position: form.role,
@@ -120,11 +118,11 @@ export default function EditProfile() {
       }
     } catch (err) {
       console.error("Network Error:", err);
-      if (err.response && err.response.data) {
-        alert(err.response.data.error || "Failed to update profile");
-      } else {
-        alert("Something went wrong. Please try again.");
-      }
+      const errorMessage =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "Failed to update profile";
+      alert(errorMessage);
     }
   };
 

@@ -22,6 +22,9 @@ export default function ManageUsers() {
       }
     } catch (error) {
       console.error("Error fetching users:", error);
+      if (error.response?.status === 401) {
+        // Handle unauthorized
+      }
     } finally {
       setLoading(false);
     }
@@ -39,6 +42,7 @@ export default function ManageUsers() {
       }
     } catch (error) {
       console.error("Error deleting user:", error);
+      alert(error.response?.data?.message || "Failed to delete user");
     }
   };
 
@@ -56,6 +60,7 @@ export default function ManageUsers() {
       }
     } catch (error) {
       console.error("Error updating role:", error);
+      alert(error.response?.data?.message || "Failed to update role");
     }
   };
 
