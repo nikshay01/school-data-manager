@@ -19,13 +19,36 @@ changes karte time changes ka reason likhne ke liye section do
 procrastinate----------------------------------
 restructuring where is which filed of input in complete profile tab
 school management me school ki details edit karne ka option add karo
-
-
-
-
+i should be albe to see activity logs on an specific student
+images in student profile
 
 
 
 
 cleanup--
 activity logs me only vo exact field show karo jise change kiya gaya hai
+
+
+
+
+
+
+
+
+
+
+
+bugs:
+admin profile icon is not aligned
+filter problen:
+               when i add a class to the filters section it only shows one student while there are more in that class
+               filter delete karne pe filter nhi hat ta uske liye clear all dabana padta hai to agar sirf ek filter hatana ho to kaise hatayenge
+fee:
+    student ki profile open karne pe fee details missing hai
+    i can add f
+
+
+
+
+backend:
+        there will be more than one person working on one school so what if they both make changes to an student at the same time
