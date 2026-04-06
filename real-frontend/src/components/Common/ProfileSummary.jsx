@@ -9,7 +9,7 @@ const ProfileSummary = ({ userData }) => {
   return (
     <Link
       to="/profile"
-      className="block h-[62px] w-[160px] mt-[15px] ml-[29px] border border-white/50 rounded-[22px] bg-gradient-to-t from-white/20 to-black/0 bg-clip-padding hover:bg-white/10 transition-all cursor-pointer"
+      className="block h-[62px] w-[200px] mt-[15px] ml-[29px] border border-white/50 rounded-[22px] bg-gradient-to-t from-white/20 to-black/0 bg-clip-padding hover:bg-white/10 transition-all cursor-pointer"
     >
       {/* Avatar Icon */}
       <div className="h-[44px] w-[44px] ml-[10px] mt-[9px]">
@@ -41,8 +41,8 @@ const ProfileSummary = ({ userData }) => {
       </div>
 
       {/* Text */}
-      <div className="ml-[56px] h-[38px] w-[105px] mt-[-44px]">
-        <p className="uppercase jul truncate text-white text-xs">
+      <div className="ml-[56px] h-auto pb-1 w-[130px] mt-[-44px]">
+        <p className="uppercase jul break-words leading-tight text-white text-[11px] mb-0.5">
           {schoolName}
         </p>
         <p className="uppercase jul truncate text-white text-xs">{username}</p>

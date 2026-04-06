@@ -25,6 +25,8 @@ export default function Fees() {
   const [viewMode, setViewMode] = useState("dashboard"); // 'dashboard' | 'list'
   const [filterType, setFilterType] = useState("all"); // 'all' | 'collected' | 'pending' | 'zero'
   const [minFee, setMinFee] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 50;
 
   // Search & Modals
   const [searchTerm, setSearchTerm] = useState("");
@@ -136,7 +138,7 @@ export default function Fees() {
     if (minFee) {
       const minVal = Number(minFee);
       if (!isNaN(minVal)) {
-        result = result.filter((s) => s.feeStats.totalStructure > minVal);
+        result = result.filter((s) => s.feeStats.received > minVal);
       }
     }
 
@@ -152,6 +154,15 @@ export default function Fees() {
 
     return result;
   }, [processedStudents, filterType, minFee, searchTerm, viewMode]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterType, minFee, searchTerm, viewMode]);
+
+  const paginatedList = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredList.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredList, currentPage]);
 
   // Quick Search for Dashboard
   const quickSearchResults = useMemo(() => {
@@ -295,7 +306,7 @@ export default function Fees() {
             <Filter className="text-yellow-400" size={24} />
           </div>
           <h3 className="text-white/60 text-sm uppercase tracking-widest mb-1">
-            0 Fees Paid
+            Zero Fees Paid
           </h3>
           <p className="text-white text-2xl font-bold text-yellow-400">
             {stats.zeroPaidCount}
@@ -548,8 +559,8 @@ export default function Fees() {
                 </tr>
               </thead>
               <tbody>
-                {filteredList.length > 0 ? (
-                  filteredList.map((s) => (
+                {paginatedList.length > 0 ? (
+                  paginatedList.map((s) => (
                     <tr
                       key={s._id}
                       className="border-b border-white/5 hover:bg-white/5 transition-colors"
@@ -607,9 +618,30 @@ export default function Fees() {
               </tbody>
             </table>
           </div>
-          <div className="mt-4 pt-4 border-t border-white/10 text-right text-white/40 text-xs">
-            Showing {filteredList.length} students
-          </div>
+          {filteredList.length > itemsPerPage ? (
+            <div className="flex justify-between items-center mt-4 pt-4 border-t border-white/10 text-white/40 text-xs">
+              <div>
+                Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredList.length)} of {filteredList.length} students
+              </div>
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 bg-white/5 hover:bg-white/10 rounded-md disabled:opacity-50"
+                >Prev</button>
+                <div className="flex items-center px-4">Page {currentPage} of {Math.ceil(filteredList.length / itemsPerPage)}</div>
+                <button 
+                  onClick={() => setCurrentPage(prev => prev * itemsPerPage < filteredList.length ? prev + 1 : prev)}
+                  disabled={currentPage * itemsPerPage >= filteredList.length}
+                  className="px-3 py-1 bg-white/5 hover:bg-white/10 rounded-md disabled:opacity-50"
+                >Next</button>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-4 pt-4 border-t border-white/10 text-right text-white/40 text-xs">
+              Showing {filteredList.length} students
+            </div>
+          )}
         </div>
       )}
 

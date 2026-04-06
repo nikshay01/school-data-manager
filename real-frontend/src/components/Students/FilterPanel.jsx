@@ -223,6 +223,9 @@ export function FilterPanel({
     const next = { ...invalidMap };
     delete next[id];
     setInvalidMap(next);
+    
+    // Automatically apply when removing
+    if (onApplyFilters) onApplyFilters(newFilters);
   };
 
   const moveFilter = (id, dir) => {

@@ -1,24 +1,29 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import "./index.css";
 import Login from "./components/Auth/login";
 import Signup from "./components/Auth/signup";
 import TopBar from "./components/Common/topBar";
-import CompleteProfile from "./components/Profile/completeProfile";
-import AdminDashboard from "./components/Dashboard/AdminDashboard";
-import ManageUsers from "./components/Management/ManageUsers";
-import ManageSchools from "./components/Management/ManageSchools";
-import Profile from "./components/Profile/Profile";
-import EditProfile from "./components/Profile/EditProfile";
-import UserDashboard from "./components/Dashboard/UserDashboard";
-import Students from "./components/Dashboard/Students";
-import Fees from "./components/Dashboard/Fees";
-import Reports from "./components/Dashboard/Reports";
+const CompleteProfile = lazy(() => import("./components/Profile/completeProfile"));
+const AdminDashboard = lazy(() => import("./components/Dashboard/AdminDashboard"));
+const ManageUsers = lazy(() => import("./components/Management/ManageUsers"));
+const ManageSchools = lazy(() => import("./components/Management/ManageSchools"));
+const Profile = lazy(() => import("./components/Profile/Profile"));
+const EditProfile = lazy(() => import("./components/Profile/EditProfile"));
+const UserDashboard = lazy(() => import("./components/Dashboard/UserDashboard"));
+const Students = lazy(() => import("./components/Dashboard/Students"));
+const Fees = lazy(() => import("./components/Dashboard/Fees"));
+const Reports = lazy(() => import("./components/Dashboard/Reports"));
+const Attendance = lazy(() => import("./components/Dashboard/Attendance"));
+const StaffList = lazy(() => import("./components/Dashboard/StaffList"));
+const Payroll = lazy(() => import("./components/Dashboard/Payroll"));
+const Expenses = lazy(() => import("./components/Dashboard/Expenses"));
 import MainLayout from "./components/Common/MainLayout";
 import Bg from "./components/Common/bg.jsx";
 import api from "./api/axios";
-import gridBg from "./assets/grid.jpg";
-import LogViewer from "./components/Logs/LogViewer";
+import gridBg from "./assets/griddd.jpg";
+const LogViewer = lazy(() => import("./components/Logs/LogViewer"));
+const DashboardSkeleton = lazy(() => import("./components/Common/DashboardSkeleton"));
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -62,70 +67,74 @@ const App = () => {
       <div className="relative h-screen w-full overflow-hidden">
         {/* ... (rest of the component) */}
         <TopBar userData={userData} />
-        <Routes>
-          {/* Public Routes */}
-          <Route
-            path="/login"
-            element={!isLoggedIn ? <Login /> : <Navigate to="/dashboard" />}
-          />
-          <Route
-            path="/signup"
-            element={!isLoggedIn ? <Signup /> : <Navigate to="/dashboard" />}
-          />
-
-          {/* Protected Routes */}
-          <Route
-            element={
-              isLoggedIn ? (
-                <MainLayout userRole={userRole} />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          >
-            <Route path="/complete-profile" element={<CompleteProfile />} />
-            <Route path="/dashboard" element={<UserDashboard />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/profile/edit" element={<EditProfile />} />
-
-            {/* Placeholder routes for Sidebar links */}
-            <Route path="/students" element={<Students />} />
-            <Route path="/fees" element={<Fees />} />
-            <Route path="/students" element={<Students />} />
-            <Route path="/fees" element={<Fees />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/logs" element={<LogViewer />} />
-
-            {/* Admin Routes */}
+        <Suspense fallback={<DashboardSkeleton />}>
+          <Routes>
+            {/* Public Routes */}
             <Route
-              path="/admin"
+              path="/login"
+              element={!isLoggedIn ? <Login /> : <Navigate to="/dashboard" />}
+            />
+            <Route
+              path="/signup"
+              element={!isLoggedIn ? <Signup /> : <Navigate to="/dashboard" />}
+            />
+
+            {/* Protected Routes */}
+            <Route
               element={
-                userRole === "admin" || userRole === "principal" ? (
-                  <AdminDashboard userRole={userRole} />
+                isLoggedIn ? (
+                  <MainLayout userRole={userRole} />
                 ) : (
-                  <Navigate to="/dashboard" />
+                  <Navigate to="/login" />
                 )
               }
             >
-              <Route path="users" element={<ManageUsers />} />
-              <Route path="schools" element={<ManageSchools />} />
-              <Route
-                index
-                element={
-                  <div className="text-white text-center text-xl">
-                    Select an option above
-                  </div>
-                }
-              />
-            </Route>
-          </Route>
+              <Route path="/complete-profile" element={<CompleteProfile />} />
+              <Route path="/dashboard" element={<UserDashboard />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/profile/edit" element={<EditProfile />} />
 
-          {/* Default Redirect */}
-          <Route
-            path="*"
-            element={<Navigate to={isLoggedIn ? "/dashboard" : "/login"} />}
-          />
-        </Routes>
+              {/* Placeholder routes for Sidebar links */}
+              <Route path="/students" element={<Students />} />
+              <Route path="/fees" element={<Fees />} />
+              <Route path="/attendance" element={<Attendance />} />
+              <Route path="/reports" element={<Reports />} />
+              <Route path="/staff" element={<StaffList />} />
+              <Route path="/payroll" element={<Payroll />} />
+              <Route path="/expenses" element={<Expenses />} />
+              <Route path="/logs" element={<LogViewer />} />
+
+              {/* Admin Routes */}
+              <Route
+                path="/admin"
+                element={
+                  userRole === "admin" || userRole === "principal" ? (
+                    <AdminDashboard userRole={userRole} />
+                  ) : (
+                    <Navigate to="/dashboard" />
+                  )
+                }
+              >
+                <Route path="users" element={<ManageUsers />} />
+                <Route path="schools" element={<ManageSchools />} />
+                <Route
+                  index
+                  element={
+                    <div className="text-white text-center text-xl">
+                      Select an option above
+                    </div>
+                  }
+                />
+              </Route>
+            </Route>
+
+            {/* Default Redirect */}
+            <Route
+              path="*"
+              element={<Navigate to={isLoggedIn ? "/dashboard" : "/login"} />}
+            />
+          </Routes>
+        </Suspense>
         {/* <Bg /> */}
         <div className="fixed inset-0 w-full h-full z-[-1]">
           <img

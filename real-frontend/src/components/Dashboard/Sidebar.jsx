@@ -6,10 +6,14 @@ const Sidebar = ({ userRole }) => {
 
   const menuItems = [
     { path: "/dashboard", label: "DASHBOARD" },
+    { path: "/attendance", label: "ATTENDANCE" },
     { path: "/students", label: "STUDENTS" },
     { path: "/fees", label: "FEES" },
     { path: "/profile", label: "PROFILE" },
     { path: "/reports", label: "REPORTS" },
+    { path: "/expenses", label: "EXPENSES" },
+    { path: "/staff", label: "STAFF" },
+    { path: "/payroll", label: "PAYROLL" },
     { path: "/logs", label: "LOGS" },
   ];
 

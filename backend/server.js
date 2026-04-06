@@ -11,6 +11,10 @@ import authRoutes from "./routes/authRoutes.js";
 import studentRoutes from "./routes/studentRoutes.js";
 import logRoutes from "./routes/logRoutes.js";
 import schoolRoutes from "./routes/schoolRoutes.js";
+import reportRoutes from "./routes/reportRoutes.js";
+import attendanceRoutes from "./routes/attendanceRoutes.js";
+import staffRoutes from "./routes/staffRoutes.js";
+import expenseRoutes from "./routes/expenseRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -46,6 +50,10 @@ app.use("/api/auth", authRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/schools", schoolRoutes);
 app.use("/api/logs", logRoutes);
+app.use("/api/reports", reportRoutes);
+app.use("/api/attendance", attendanceRoutes);
+app.use("/api/staff", staffRoutes);
+app.use("/api/expenses", expenseRoutes);
 
 app.get("/", (req, res) => {
   res.send("School Data Manager API is running...");

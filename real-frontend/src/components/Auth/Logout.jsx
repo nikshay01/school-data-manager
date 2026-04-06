@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { LogOut, LogIn } from "lucide-react";
 import "../../App.css";
 
 function Logout() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const location = useLocation();
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
-  }, []);
+  }, [location.pathname]);
 
   const handleClick = () => {
     if (isLoggedIn) {

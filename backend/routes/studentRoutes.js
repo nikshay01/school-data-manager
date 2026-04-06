@@ -7,12 +7,16 @@ import {
   deleteStudent,
   passwordCheck,
   srNoSearch,
+  getClasses,
+  promoteStudents,
 } from "../controllers/studentController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
+router.post("/promote", protect, promoteStudents);
 router.post("/", protect, addStudent);
+router.get("/classes/all", protect, getClasses);
 router.get("/:id", protect, getStudents); // class filter
 router.get("/single/:id", protect, getStudentById);
 router.put("/:id", protect, updateStudent);

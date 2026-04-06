@@ -39,13 +39,12 @@ activity logs me only vo exact field show karo jise change kiya gaya hai
 
 
 bugs:
+if mongodb is disconnected it cant reconnect
 admin profile icon is not aligned
 filter problen:
                when i add a class to the filters section it only shows one student while there are more in that class
                filter delete karne pe filter nhi hat ta uske liye clear all dabana padta hai to agar sirf ek filter hatana ho to kaise hatayenge
 fee:
-    student ki profile open karne pe fee details missing hai
-    i can add f
 
 
 

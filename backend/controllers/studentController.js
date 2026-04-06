@@ -168,3 +168,41 @@ export const passwordCheck = (req, res) => {
   const pw = req.params.id;
   res.json({ message: pw == 123321 });
 };
+
+// @desc    Get all distinct classes
+// @route   GET /api/students/classes/all
+// @access  Private
+export const getClasses = asyncHandler(async (req, res) => {
+  const classes = await Student.distinct("class", { school: req.user.school });
+  const filtered = classes.filter((c) => c).sort();
+  res.json(filtered);
+});
+
+// @desc    Promote students to a new class
+// @route   POST /api/students/promote
+// @access  Private
+export const promoteStudents = asyncHandler(async (req, res) => {
+  const { currentClass, nextClass } = req.body;
+
+  if (!currentClass || !nextClass) {
+    res.status(400);
+    throw new Error("Both currentClass and nextClass are required.");
+  }
+
+  const result = await Student.updateMany(
+    { school: req.user.school, class: currentClass, leftSchool: false },
+    { $set: { class: nextClass } }
+  );
+
+  await createLog(
+    "UPDATE",
+    "Student",
+    "Bulk",
+    `Promoted ${result.modifiedCount} students from ${currentClass} to ${nextClass}`,
+    {},
+    req.user,
+    req.ip
+  );
+
+  res.json({ message: "Promotion successful", modifiedCount: result.modifiedCount });
+});

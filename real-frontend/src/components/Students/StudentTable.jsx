@@ -9,6 +9,8 @@ import ColumnSelectorPanel from "./ColumnSelectorPanel";
 import FilterPanel from "./FilterPanel";
 import StudentProfileModal from "./StudentProfileModal";
 import FeesModal from "./FeesModal";
+import PromoteModal from "../Dashboard/PromoteModal";
+import { GraduationCap } from "lucide-react";
 
 const StudentTable = () => {
   // --- State ---
@@ -29,6 +31,7 @@ const StudentTable = () => {
   const [activeFeeModal, setActiveFeeModal] = useState(null); // { type: 'add'|'edit'|'history', student: ... }
   const [showColumnSelector, setShowColumnSelector] = useState(false);
   const [showFilterPanel, setShowFilterPanel] = useState(false);
+  const [showPromoteModal, setShowPromoteModal] = useState(false);
   const [rowDensity, setRowDensity] = useState("standard");
   const [showDensitySelector, setShowDensitySelector] = useState(false);
   const [notification, setNotification] = useState(null);
@@ -73,26 +76,24 @@ const StudentTable = () => {
 
   const observerTarget = useRef(null);
 
+  const fetchStudentsData = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get("/students/0");
+      const processedData = response.data.map(processStudentData);
+      setAllStudents(processedData);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching students:", err);
+      setError("Failed to load student data. Please ensure the backend is running.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // --- Data Fetching ---
   useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        setLoading(true);
-        const response = await api.get("/students/0");
-        const processedData = response.data.map(processStudentData);
-        setAllStudents(processedData);
-        setError(null);
-      } catch (err) {
-        console.error("Error fetching students:", err);
-        setError(
-          "Failed to load student data. Please ensure the backend is running."
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStudents();
+    fetchStudentsData();
   }, []);
 
   const processStudentData = (student) => {
@@ -441,6 +442,12 @@ const StudentTable = () => {
 
           <div className="flex gap-4">
             <button
+              onClick={() => setShowPromoteModal(true)}
+              className="px-4 py-2 backdrop-blur-md bg-blue-600/20 border border-blue-500/50 rounded-xl text-blue-300 font-bold hover:bg-blue-600/40 transition-all flex items-center gap-2"
+            >
+              <GraduationCap size={18} /> PROMOTE CLASS
+            </button>
+            <button
               onClick={() => setShowFilterPanel(true)}
               className={`px-4 py-2 rounded-xl border transition-all flex items-center gap-2 font-bold backdrop-blur-md ${
                 filters.length > 0
@@ -654,6 +661,16 @@ const StudentTable = () => {
         type={activeFeeModal?.type}
         student={activeFeeModal?.student}
         onUpdate={handleFeeUpdate}
+      />
+
+      {/* Promote Modal */}
+      <PromoteModal 
+        isOpen={showPromoteModal}
+        onClose={() => setShowPromoteModal(false)}
+        onPromoteComplete={(count, from, to) => {
+          showNotification(`Successfully promoted ${count} students to ${to}`, "success");
+          fetchStudentsData(); // Refresh table data
+        }}
       />
     </div>
   );

@@ -10,7 +10,7 @@ const MainLayout = ({ userRole }) => {
 
       {/* Main Content Area */}
       <div className="pl-[210px] mt-[93px] h-[calc(100vh-93px)] w-full overflow-y-auto">
-        <div className="p-8 w-full min-h-full">
+        <div className="p-8 w-full min-h-[calc(100vh-93px)] flex flex-col">
           <Outlet />
         </div>
       </div>

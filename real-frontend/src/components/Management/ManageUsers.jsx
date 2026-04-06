@@ -87,7 +87,7 @@ export default function ManageUsers() {
                 key={user._id}
                 className="border-b border-white/10 hover:bg-white/5"
               >
-                <td className="p-4">{user.name || user.username}</td>
+                <td className="p-4">{user.name || user.username || user.email?.split("@")[0]}</td>
                 <td className="p-4">{user.email}</td>
                 <td className="p-4">{user.school?.name || "N/A"}</td>
                 <td className="p-4">
