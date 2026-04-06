@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../../index.css";
 import "../../App.css";
 import api from "../../api/axios";
+import { Edit, Save, X } from "lucide-react";
 
 export default function ManageSchools() {
   const [schools, setSchools] = useState([]);
@@ -13,6 +14,8 @@ export default function ManageSchools() {
     contactPhone: "",
   });
   const [loading, setLoading] = useState(true);
+  const [editingSchoolId, setEditingSchoolId] = useState(null);
+  const [editFormData, setEditFormData] = useState({});
 
   useEffect(() => {
     fetchSchools();
@@ -60,6 +63,33 @@ export default function ManageSchools() {
       console.error("Error adding school:", error);
       alert(error.response?.data?.message || "Failed to add school");
     }
+  };
+
+  const handleEditClick = (school) => {
+    setEditingSchoolId(school._id);
+    setEditFormData({ ...school });
+  };
+
+  const handleEditChange = (e) => {
+    setEditFormData({ ...editFormData, [e.target.name]: e.target.value });
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      const response = await api.put(`/schools/${editingSchoolId}`, editFormData);
+      if (response.status === 200) {
+        setSchools(schools.map(s => s._id === editingSchoolId ? response.data : s));
+        setEditingSchoolId(null);
+        // alert("School updated successfully!");
+      }
+    } catch (error) {
+      console.error("Error updating school:", error);
+      alert("Failed to update school");
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingSchoolId(null);
   };
 
   if (loading)
@@ -127,11 +157,12 @@ export default function ManageSchools() {
       <div className="overflow-x-auto">
         <table className="w-full text-left text-white border-collapse">
           <thead>
-            <tr className="border-b border-white/20">
+            <tr className="border-b border-white/20 text-white/50 text-sm uppercase tracking-widest">
               <th className="p-4">Name</th>
               <th className="p-4">Code</th>
               <th className="p-4">Address</th>
               <th className="p-4">Contact</th>
+              <th className="p-4 text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -140,13 +171,51 @@ export default function ManageSchools() {
                 key={school._id}
                 className="border-b border-white/10 hover:bg-white/5"
               >
-                <td className="p-4">{school.name}</td>
-                <td className="p-4">{school.code}</td>
-                <td className="p-4">{school.address}</td>
-                <td className="p-4">
-                  {school.contactEmail && <div>{school.contactEmail}</div>}
-                  {school.contactPhone && <div>{school.contactPhone}</div>}
-                </td>
+                {editingSchoolId === school._id ? (
+                  <>
+                    <td className="p-2">
+                      <input className="input" name="name" value={editFormData.name} onChange={handleEditChange} />
+                    </td>
+                    <td className="p-2">
+                      <input className="input" name="code" value={editFormData.code} onChange={handleEditChange} />
+                    </td>
+                    <td className="p-2">
+                      <input className="input" name="address" value={editFormData.address} onChange={handleEditChange} />
+                    </td>
+                    <td className="p-2 flex flex-col gap-1">
+                      <input className="input" name="contactEmail" value={editFormData.contactEmail || ""} onChange={handleEditChange} placeholder="Email" />
+                      <input className="input" name="contactPhone" value={editFormData.contactPhone || ""} onChange={handleEditChange} placeholder="Phone" />
+                    </td>
+                    <td className="p-2">
+                      <div className="flex justify-center gap-2">
+                        <button onClick={handleSaveEdit} className="p-2 bg-green-500/20 text-green-400 rounded-xl hover:bg-green-500/40">
+                          <Save size={16} />
+                        </button>
+                        <button onClick={handleCancelEdit} className="p-2 bg-red-500/20 text-red-400 rounded-xl hover:bg-red-500/40">
+                          <X size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </>
+                ) : (
+                  <>
+                    <td className="p-4 font-bold">{school.name}</td>
+                    <td className="p-4 text-white/70">{school.code}</td>
+                    <td className="p-4 text-white/70">{school.address}</td>
+                    <td className="p-4 text-white/70">
+                      {school.contactEmail && <div>{school.contactEmail}</div>}
+                      {school.contactPhone && <div>{school.contactPhone}</div>}
+                    </td>
+                    <td className="p-4 flex justify-center">
+                      <button
+                        onClick={() => handleEditClick(school)}
+                        className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-blue-300 transition-all shadow-sm"
+                      >
+                        <Edit size={16} />
+                      </button>
+                    </td>
+                  </>
+                )}
               </tr>
             ))}
           </tbody>

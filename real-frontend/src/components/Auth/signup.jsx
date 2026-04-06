@@ -77,7 +77,7 @@ function Signup() {
   const handleSendOtp = () => {
     setResult({
       status: "success",
-      message: "OTP sent to " + formValues.email,
+      message: "Development Mode: OTP verification bypassed. Click Sign Up below.",
     });
   };
 
@@ -114,25 +114,18 @@ function Signup() {
               autoComplete="email"
               required
             />
-            <button
-              type="button"
-              className="absolute right-[14px] top-1/2 -translate-y-1/2 text-white font-mono text-[15px] underline hover:opacity-80 px-2"
-              style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 400 }}
-              onClick={handleSendOtp}
-            >
-              SEND OTP
-            </button>
           </div>
 
           <input
             type="text"
-            className="input"
+            className="input opacity-50 cursor-not-allowed"
             id="otp"
             name="otp"
-            placeholder="OTP"
+            placeholder="OTP (Not Required)"
             value={formValues.otp}
             onChange={handleChange}
             autoComplete="one-time-code"
+            disabled
           />
 
           <input

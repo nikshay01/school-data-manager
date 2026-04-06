@@ -10,7 +10,8 @@ import FilterPanel from "./FilterPanel";
 import StudentProfileModal from "./StudentProfileModal";
 import FeesModal from "./FeesModal";
 import PromoteModal from "../Dashboard/PromoteModal";
-import { GraduationCap } from "lucide-react";
+import AddStudentModal from "./AddStudentModal";
+import { GraduationCap, Plus } from "lucide-react";
 
 const StudentTable = () => {
   // --- State ---
@@ -34,6 +35,7 @@ const StudentTable = () => {
   const [showPromoteModal, setShowPromoteModal] = useState(false);
   const [rowDensity, setRowDensity] = useState("standard");
   const [showDensitySelector, setShowDensitySelector] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [notification, setNotification] = useState(null);
 
   const [columns, setColumns] = useState([
@@ -442,6 +444,12 @@ const StudentTable = () => {
 
           <div className="flex gap-4">
             <button
+              onClick={() => setShowAddModal(true)}
+              className="px-6 py-2 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(37,99,235,0.4)]"
+            >
+              <Plus size={20} /> ADD STUDENT
+            </button>
+            <button
               onClick={() => setShowPromoteModal(true)}
               className="px-4 py-2 backdrop-blur-md bg-blue-600/20 border border-blue-500/50 rounded-xl text-blue-300 font-bold hover:bg-blue-600/40 transition-all flex items-center gap-2"
             >
@@ -670,6 +678,16 @@ const StudentTable = () => {
         onPromoteComplete={(count, from, to) => {
           showNotification(`Successfully promoted ${count} students to ${to}`, "success");
           fetchStudentsData(); // Refresh table data
+        }}
+      />
+
+      {/* Add Student Modal */}
+      <AddStudentModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onStudentAdded={() => {
+          showNotification("Student added successfully", "success");
+          fetchStudentsData();
         }}
       />
     </div>

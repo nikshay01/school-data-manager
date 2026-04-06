@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import School from "../models/School.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
@@ -30,11 +31,15 @@ export const signupUser = asyncHandler(async (req, res) => {
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
+  // Dynamically assign an existing school to avoid invalid reference errors later
+  const defaultSchool = await School.findOne({});
+  const schoolId = defaultSchool ? defaultSchool._id : null;
+
   const user = await User.create({
     email,
     password: hashedPassword,
     username: email.split("@")[0] + Math.floor(Math.random() * 1000), // Temp username
-    school: "675c613045339d675628676d", // Placeholder, should be dynamic or handled in completeProfile
+    school: schoolId, // Fallback to null if no school exists yet
     name: "New User", // Placeholder
   });
 
@@ -177,4 +182,45 @@ export const deleteUser = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("User not found");
   }
+});
+
+// @desc    Search unassigned or all users
+// @route   GET /api/auth/search-users
+// @access  Private/Admin/Principal
+export const searchUsers = asyncHandler(async (req, res) => {
+  const query = req.query.q;
+  if (!query) return res.json([]);
+  
+  const searchRegex = new RegExp(query, 'i');
+  
+  const users = await User.find({
+    $or: [
+      { email: searchRegex },
+      { username: searchRegex },
+      { contact: searchRegex },
+      { name: searchRegex }
+    ]
+  }).select("name email username contact position school").limit(10).populate("school", "name code");
+  
+  res.json(users);
+});
+
+// @desc    Assign user to the caller's school
+// @route   PUT /api/auth/users/:id/assign-school
+// @access  Private/Admin/Principal
+export const assignUserToSchool = asyncHandler(async (req, res) => {
+  const targetUser = await User.findById(req.params.id);
+  if (!targetUser) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+  
+  if (!req.user.school) {
+    res.status(400);
+    throw new Error("You must be assigned to a school to assign other users.");
+  }
+
+  targetUser.school = req.user.school;
+  await targetUser.save();
+  res.json({ message: "User successfully assigned to your school." });
 });

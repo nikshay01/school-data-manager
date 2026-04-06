@@ -18,3 +18,13 @@ export const createSchool = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+export const updateSchool = async (req, res) => {
+  try {
+    const school = await School.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!school) return res.status(404).json({ message: "School not found" });
+    res.json(school);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};

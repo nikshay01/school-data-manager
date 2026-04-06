@@ -50,4 +50,8 @@ fee:
 
 
 backend:
-        there will be more than one person working on one school so what if they both make changes to an student at the same time
+        there will be more than one person working on one school so what if they both make changes to an student at the same timej
+
+
+in student table i can get only the fields form the backend that are needed and call the full data in the bg asynchronosly
+gotta change class form e.g. 7th to 7

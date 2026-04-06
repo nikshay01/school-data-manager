@@ -1,4 +1,5 @@
 import express from "express";
+import path from "path";
 import cors from "cors"; 
 import dotenv from "dotenv";
 import helmet from "helmet";
@@ -55,8 +56,17 @@ app.use("/api/attendance", attendanceRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/expenses", expenseRoutes);
 
-app.get("/", (req, res) => {
-  res.send("School Data Manager API is running...");
+const __dirname = path.resolve();
+
+// Serve frontend static files
+app.use(express.static(path.join(__dirname, "../real-frontend/dist")));
+
+// Catch-all to serve React app for non-API routes
+app.use((req, res, next) => {
+  if (req.originalUrl.startsWith("/api")) {
+    return next();
+  }
+  res.sendFile(path.join(__dirname, "../real-frontend/dist/index.html"));
 });
 
 // Error Handling

@@ -2,10 +2,13 @@ import React, { useState, useEffect } from "react";
 import "../../index.css";
 import "../../App.css";
 import api from "../../api/axios";
+import AssignUserModal from "./AssignUserModal";
+import { Plus } from "lucide-react";
 
 export default function ManageUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showAssignModal, setShowAssignModal] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -69,7 +72,17 @@ export default function ManageUsers() {
 
   return (
     <div className="w-full">
-      <h2 className="text-white text-2xl font-bold mb-6">User Management</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-white text-2xl font-bold">User Management</h2>
+        <button
+          onClick={() => setShowAssignModal(true)}
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)]"
+        >
+          <Plus size={20} />
+          Assign User to My School
+        </button>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="w-full text-left text-white border-collapse">
           <thead>
@@ -116,6 +129,13 @@ export default function ManageUsers() {
           </tbody>
         </table>
       </div>
+
+      {/* Assign User Modal */}
+      <AssignUserModal
+        isOpen={showAssignModal}
+        onClose={() => setShowAssignModal(false)}
+        onAssignSuccess={() => fetchUsers()} 
+      />
     </div>
   );
 }

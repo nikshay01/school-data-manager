@@ -7,6 +7,8 @@ import {
   updateUser,
   deleteUser,
   getCurrentUser,
+  searchUsers,
+  assignUserToSchool,
 } from "../controllers/authController.js";
 import { protect, authorize } from "../middleware/authMiddleware.js";
 
@@ -18,6 +20,10 @@ router.post("/login", loginUser);
 // Protected Routes
 router.put("/complete-profile", protect, completeProfile);
 router.get("/me", protect, getCurrentUser);
+
+// Search Users for Assignment
+router.get("/search-users", protect, authorize("admin", "principal"), searchUsers);
+router.put("/users/:id/assign-school", protect, authorize("admin", "principal"), assignUserToSchool);
 
 // Admin Routes
 router.get("/users", protect, authorize("admin"), getAllUsers);
